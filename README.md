@@ -5,9 +5,9 @@ Jobra aims to turn a user-verified candidate profile into evidence-based,
 explainable opportunity recommendations. Users review opportunities and apply
 themselves; Jobra must never automatically submit applications.
 
-**Status: early development (`0.0.1`).** Local resume text extraction and
-unverified candidate drafts are available. Profile review, job research,
-matching, and saved job results are not implemented.
+**Status: early development (`0.0.1`).** Local resume extraction, candidate
+drafts, and explicit profile review are available. Job research, matching,
+and saved job results are not implemented.
 
 ## Design
 
@@ -46,7 +46,8 @@ Restart the desktop app, open that workspace, select `jobra-dev` in the Plugins
 Directory, and install Jobra. Select its `jobra` skill and supply `setup`,
 `profile`, `research`, or `results` as task text. These are intended skill
 arguments, not shell commands or separate skills. `setup` creates an unverified
-draft; the other workflows remain planned.
+draft, and `profile` guides human verification. `research` and `results` remain
+planned.
 
 Marketplace availability varies by host. Older hosts may need a compatibility
 manifest; support for them is not claimed. Installation and fresh-chat discovery
@@ -73,5 +74,6 @@ when they contain useful material. The [candidate data contract](docs/candidate-
 defines profile and preference documents. [Resume ingestion](docs/resume-ingestion.md)
 documents the local extraction and draft workflow.
 
-The project is intended for open-source release. A license must be selected and
+See [profile review](docs/profile-review.md) for the review utility and safety
+rules. The project is intended for open-source release. A license must be selected and
 added before release; this version does not declare one.

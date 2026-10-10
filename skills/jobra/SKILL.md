@@ -1,6 +1,6 @@
 ---
 name: jobra
-description: Create an evidence-backed, unverified candidate profile draft from an approved local PDF, DOCX, Markdown, or TXT resume. Use for Jobra setup and candidate profile requests; research, results, and profile review are not yet implemented.
+description: Create an evidence-backed candidate profile draft from an approved local resume, then guide explicit human review and verification. Use for Jobra setup and profile requests; research and results are not yet implemented.
 ---
 
 # Jobra
@@ -9,11 +9,11 @@ description: Create an evidence-backed, unverified candidate profile draft from 
 
 The [candidate profile schema](references/candidate-profile.schema.json) and
 [search preferences schema](references/search-preferences.schema.json) define
-the data contract. `setup` can create an unverified draft from an explicitly
-approved local resume. Read
-[the setup workflow](references/setup-workflow.md) before using it. `profile`
-review, `research`, and `results` are not implemented; describe their intended
-outcome without pretending to run them.
+the data contract. `setup` creates an unverified draft from an approved local
+resume; read [the setup workflow](references/setup-workflow.md). `profile`
+reviews a saved draft; read [the profile workflow](references/profile-workflow.md).
+`research` and `results` are not implemented; describe their intended outcome
+without pretending to run them.
 
 ## Intended task arguments
 
@@ -22,7 +22,7 @@ Treat these as task text supplied to this one skill, not executable commands:
 | Argument | Intended outcome |
 | --- | --- |
 | `setup` | Extract an approved local resume and create an evidence-linked candidate profile draft for later user verification. |
-| `profile` | Review or update skills, experience, preferences, and evidence; obtain user confirmation before marking a draft verified. |
+| `profile` | Review evidence and candidate records, explicitly confirm each section, and request final approval before verification. Search preferences remain a separate document. |
 | `research` | Research relevant opportunities using the verified profile and approved criteria; retain source links and retrieval dates. |
 | `results` | Review locally saved opportunities and sources; explain fit, gaps, and uncertainty when evaluation becomes available. |
 

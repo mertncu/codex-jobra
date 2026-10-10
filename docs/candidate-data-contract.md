@@ -61,7 +61,8 @@ evidence; rejected evidence cannot support an accepted record. This supports a
 complete review without forcing the user to accept every extracted claim.
 External workflow code must run validation before writing a verified profile,
 and should derive the status from actual review actions. The `setup` workflow
-can save an unverified draft; user review and verification remain unimplemented.
+saves an unverified draft; the `profile` workflow applies explicit user decisions
+through the [review utility](profile-review.md).
 
 Search preferences include preferred and excluded roles, locations, work
 arrangements, and seniority. Empty lists mean unspecified, not inferred from
