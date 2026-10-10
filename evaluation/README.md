@@ -89,6 +89,10 @@ private candidate content.
 
 ## Limits
 
+For independent review of source-grounded unmatched claims and shorter
+evidence excerpts, see [human adjudication](adjudication.md). It keeps reviewer
+decisions separate from the golden labels and original predictions.
+
 This dataset is intentionally small and synthetic; it cannot estimate
 real-world performance or bias. Gold covers selected literal facts, not every
 possible valid claim, and strict text matching undercredits paraphrases. Some
