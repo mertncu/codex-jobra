@@ -1,0 +1,36 @@
+{
+  "schema_version": "1",
+  "verification_status": "draft",
+  "section_reviews": {
+    "education": "pending",
+    "experience": "pending",
+    "projects": "pending",
+    "technical_skills": "pending",
+    "suggested_roles": "pending"
+  },
+  "source_documents": [
+    {"id": "synthetic_resume", "kind": "resume", "label": "Invented example only"}
+  ],
+  "evidence": [
+    {"id": "ev_school", "source_document_id": "synthetic_resume", "location": "Education", "excerpt": "Example University — BSc Computer Science", "extraction": "explicit", "review_status": "pending"},
+    {"id": "ev_intern", "source_document_id": "synthetic_resume", "location": "Experience", "excerpt": "Software intern at Example Studio", "extraction": "explicit", "review_status": "pending"},
+    {"id": "ev_project", "source_document_id": "synthetic_resume", "location": "Projects", "excerpt": "Built a sample task tracker with Python", "extraction": "explicit", "review_status": "pending"},
+    {"id": "ev_skill", "source_document_id": "synthetic_resume", "location": "Skills", "excerpt": "Python", "extraction": "explicit", "review_status": "pending"},
+    {"id": "ev_role", "source_document_id": "synthetic_resume", "location": "Experience and Projects", "extraction": "inferred", "review_status": "pending"}
+  ],
+  "education": [
+    {"id": "edu_1", "origin": "extracted", "review_status": "pending", "evidence_ids": ["ev_school"], "institution": "Example University", "credential": "BSc", "field": "Computer Science"}
+  ],
+  "experience": [
+    {"id": "exp_1", "origin": "extracted", "review_status": "pending", "evidence_ids": ["ev_intern"], "organization": "Example Studio", "role": "Software intern", "kind": "internship"}
+  ],
+  "projects": [
+    {"id": "proj_1", "origin": "extracted", "review_status": "pending", "evidence_ids": ["ev_project"], "name": "Sample task tracker", "summary": "Python demo project"}
+  ],
+  "technical_skills": [
+    {"id": "skill_1", "origin": "extracted", "review_status": "pending", "evidence_ids": ["ev_skill"], "name": "Python", "level": "unknown"}
+  ],
+  "suggested_roles": [
+    {"id": "role_1", "origin": "extracted", "review_status": "pending", "evidence_ids": ["ev_role"], "title": "Software developer"}
+  ]
+}

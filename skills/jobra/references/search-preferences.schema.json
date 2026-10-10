@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jobra.local/schemas/search-preferences.v1.json",
+  "title": "Jobra search preferences v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "preferred_roles", "excluded_roles", "locations", "work_arrangements", "seniority_preferences"],
+  "properties": {
+    "schema_version": {"const": "1"},
+    "preferred_roles": {"$ref": "#/$defs/strings"},
+    "excluded_roles": {"$ref": "#/$defs/strings"},
+    "locations": {"$ref": "#/$defs/strings"},
+    "work_arrangements": {
+      "type": "array", "uniqueItems": true,
+      "items": {"enum": ["remote", "hybrid", "onsite"]}
+    },
+    "seniority_preferences": {
+      "type": "array", "uniqueItems": true,
+      "items": {"enum": ["internship", "entry", "mid", "senior", "lead"]}
+    }
+  },
+  "$defs": {
+    "strings": {
+      "type": "array", "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    }
+  }
+}

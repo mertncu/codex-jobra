@@ -68,7 +68,9 @@ under the user's Codex configuration and service settings.
 See [validation notes](docs/validation.md). Future utilities belong in
 `skills/jobra/scripts/`, workflow references in `skills/jobra/references/`, tests
 in `tests/`, and synthetic examples in `examples/`; create those directories
-when they contain useful material. No placeholder implementations are included.
+when they contain useful material. The [candidate data contract](docs/candidate-data-contract.md)
+now defines profile and preference documents with synthetic tests. It does not
+parse resumes or run interactive workflows.
 
 The project is intended for open-source release. A license must be selected and
 added before release; this version does not declare one.

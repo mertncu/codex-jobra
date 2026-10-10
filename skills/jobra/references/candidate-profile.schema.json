@@ -1,0 +1,342 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jobra.local/schemas/candidate-profile.v1.json",
+  "title": "Jobra candidate profile v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "verification_status",
+    "section_reviews",
+    "source_documents",
+    "evidence",
+    "education",
+    "experience",
+    "projects",
+    "technical_skills",
+    "suggested_roles"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "verification_status": {
+      "enum": [
+        "draft",
+        "verified"
+      ]
+    },
+    "section_reviews": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "education",
+        "experience",
+        "projects",
+        "technical_skills",
+        "suggested_roles"
+      ],
+      "properties": {
+        "education": {
+          "$ref": "#/$defs/section_review"
+        },
+        "experience": {
+          "$ref": "#/$defs/section_review"
+        },
+        "projects": {
+          "$ref": "#/$defs/section_review"
+        },
+        "technical_skills": {
+          "$ref": "#/$defs/section_review"
+        },
+        "suggested_roles": {
+          "$ref": "#/$defs/section_review"
+        }
+      }
+    },
+    "source_documents": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source_document"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence"
+      }
+    },
+    "education": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/education"
+      }
+    },
+    "experience": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/experience"
+      }
+    },
+    "projects": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/project"
+      }
+    },
+    "technical_skills": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/skill"
+      }
+    },
+    "suggested_roles": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/role"
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "review": {
+      "enum": [
+        "pending",
+        "confirmed",
+        "corrected",
+        "rejected"
+      ]
+    },
+    "section_review": {
+      "enum": [
+        "pending",
+        "confirmed"
+      ]
+    },
+    "source_document": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "enum": [
+            "resume",
+            "other"
+          ]
+        },
+        "label": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source_document_id",
+        "extraction",
+        "review_status"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "source_document_id": {
+          "$ref": "#/$defs/id"
+        },
+        "location": {
+          "$ref": "#/$defs/text"
+        },
+        "excerpt": {
+          "$ref": "#/$defs/text"
+        },
+        "extraction": {
+          "enum": [
+            "explicit",
+            "inferred"
+          ]
+        },
+        "review_status": {
+          "$ref": "#/$defs/review"
+        },
+        "correction_note": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "record": {
+      "type": "object",
+      "required": [
+        "id",
+        "origin",
+        "review_status",
+        "evidence_ids"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "origin": {
+          "enum": [
+            "extracted",
+            "user"
+          ]
+        },
+        "review_status": {
+          "$ref": "#/$defs/review"
+        },
+        "evidence_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "correction_note": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "education": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/record"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "institution"
+      ],
+      "properties": {
+        "institution": {
+          "$ref": "#/$defs/text"
+        },
+        "credential": {
+          "$ref": "#/$defs/text"
+        },
+        "field": {
+          "$ref": "#/$defs/text"
+        },
+        "period": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "unevaluatedProperties": false
+    },
+    "experience": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/record"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "organization",
+        "role",
+        "kind"
+      ],
+      "properties": {
+        "organization": {
+          "$ref": "#/$defs/text"
+        },
+        "role": {
+          "$ref": "#/$defs/text"
+        },
+        "kind": {
+          "enum": [
+            "work",
+            "internship"
+          ]
+        },
+        "period": {
+          "$ref": "#/$defs/text"
+        },
+        "summary": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "unevaluatedProperties": false
+    },
+    "project": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/record"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/text"
+        },
+        "summary": {
+          "$ref": "#/$defs/text"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "unevaluatedProperties": false
+    },
+    "skill": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/record"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "name",
+        "level"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/text"
+        },
+        "level": {
+          "enum": [
+            "unknown",
+            "beginner",
+            "intermediate",
+            "advanced"
+          ]
+        }
+      },
+      "unevaluatedProperties": false
+    },
+    "role": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/record"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "title"
+      ],
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "unevaluatedProperties": false
+    }
+  }
+}

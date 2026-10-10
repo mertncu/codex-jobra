@@ -7,10 +7,11 @@ description: CV-aware job opportunity research for Jobra, including candidate se
 
 ## Current scope
 
-This is a repository foundation release. For any workflow request, explain
-that it is not implemented and describe its intended outcome below. Do not read
-CVs, generate profiles, browse jobs, fabricate results, or imply that data has
-been saved by this release. Do not request personal data to demonstrate it.
+The candidate profile and search preferences data contract is defined in
+[the contract guide](../../docs/candidate-data-contract.md). The workflows below
+are not implemented. For a workflow request, explain its intended outcome. Do
+not read CVs, generate profiles, browse jobs, fabricate results, or imply that
+data has been saved by this release. Do not request personal data to demonstrate it.
 
 ## Intended task arguments
 

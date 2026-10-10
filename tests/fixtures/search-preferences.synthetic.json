@@ -1,0 +1,8 @@
+{
+  "schema_version": "1",
+  "preferred_roles": ["Software developer"],
+  "excluded_roles": ["Sales engineer"],
+  "locations": ["Example City"],
+  "work_arrangements": ["remote", "hybrid"],
+  "seniority_preferences": ["entry"]
+}
