@@ -81,3 +81,8 @@ See [profile review](docs/profile-review.md) for batch operations, atomicity,
 privacy, and verified-profile immutability. The project is intended for
 open-source release. A license must be selected and added before release; this
 version does not declare one.
+
+Candidate Intelligence evaluation is available as a small, synthetic golden
+dataset and deterministic scorer. See [the evaluation workflow](evaluation/README.md)
+and its [example report](evaluation/example-report.md). No Codex extraction
+accuracy is claimed until independently generated predictions are evaluated.
