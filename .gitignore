@@ -1,0 +1,61 @@
+# Local planning documents
+[Rr][Oo][Aa][Dd][Mm][Aa][Pp]*.md
+
+# Private working data
+.jobra/
+data/
+private/
+local/
+cvs/
+resumes/
+profiles/
+research/
+results/
+*.local.*
+
+# Common resume inputs; use synthetic text fixtures for future tests.
+*.pdf
+*.doc
+*.docx
+*.odt
+*.rtf
+
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+secrets/
+credentials/
+*.pem
+*.key
+*.p12
+*.pfx
+.aws/
+
+# Python environments, caches, build and test output
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+build/
+dist/
+*.egg-info/
+
+# Editor, OS and diagnostic artifacts
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*.log

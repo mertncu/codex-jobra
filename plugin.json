@@ -1,0 +1,6 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "jobra",
+  "version": "0.0.1",
+  "description": "CV-aware job opportunity research for Codex. Repository foundation; workflows are not yet implemented."
+}
