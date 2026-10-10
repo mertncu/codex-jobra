@@ -29,13 +29,20 @@
    `finalize` operation with `approved: true`. Without that answer, leave it a
    draft. Validation must pass before any snapshot is saved.
 
-Apply each user decision with `scripts/review_profile.py PROFILE_JSON
-OPERATION_JSON --workspace WORKSPACE_PATH`. Write operation JSON only inside
-`WORKSPACE_PATH/.jobra/`; each call returns a new snapshot under
-`.jobra/profiles/`. Use that new path for the next decision. The script prints
-only a status and relative output path; do not print private records or excerpts
-in terminal logs. See [review operation reference](profile-review-operations.md)
-for the exact operation shapes. Codex handles the conversation; Python handles
-transitions, validation, and storage. Neither the script nor JSON can prove
-human authorization, so Codex must only create operation files reflecting the
-user's actual decisions.
+Apply user decisions with `scripts/review_profile.py PROFILE_JSON
+OPERATION_JSON --workspace WORKSPACE_PATH`. Once the user has explicitly
+decided several claims, group those decisions in an ordered batch to save one
+snapshot. Put evidence decisions before dependent record decisions, and section
+confirmation after its records. Do not add unreviewed claims to a batch. Write
+operation JSON only inside `WORKSPACE_PATH/.jobra/`; each successful single or
+batch request returns one new snapshot under `.jobra/profiles/`. Use its path
+for the next request. The entire batch is validated before persistence; any
+failed decision leaves the input snapshot unchanged and writes nothing. Never
+put `finalize` in a batch or treat batch submission as approval. After showing
+the completed review, obtain separate explicit final approval and submit
+`finalize` alone. The script prints only a status and relative output path; do
+not print private records or excerpts in terminal logs. See
+[review operation reference](profile-review-operations.md) for exact shapes.
+Codex handles the conversation; Python handles transitions, validation, and
+storage. Neither the script nor JSON can prove human authorization, so Codex
+must only create operation files reflecting the user's actual decisions.

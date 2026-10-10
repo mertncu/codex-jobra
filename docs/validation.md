@@ -51,13 +51,58 @@ git diff --check
 git check-ignore .jobra/cv.txt resumes/candidate.pdf profiles/candidate.json research/jobs.json results/report.md .env .env.production secrets/token.txt .venv/bin/python __pycache__/a.pyc
 ```
 
-## Remaining compatibility work
+## Task 3.1 package and discovery check
 
-Follow the README's documented local marketplace flow and test installation and
-skill discovery in fresh and existing chats on each supported host. Confirm each
-task argument reports its foundation-only status without accessing personal data
-or performing research. No user settings were modified and no plugin was installed
-as part of this setup.
+After adding batch review, the portable manifest again passed the cached
+published Agent Plugins 1.0.0 JSON Schema, and OpenAI `skill-creator`'s
+`quick_validate.py skills/jobra` returned `Skill is valid!`. The root
+`plugin.json` and `skills/jobra/SKILL.md` match the current
+[official packaging guide](https://developers.openai.com/plugins/build/plugins):
+portable packages discover skills from root `skills/` without a manifest
+`skills` field. All profile workflow references and scripts are packaged under
+that directory. These checks establish package structure, not runtime discovery.
+
+A clean temporary Git workspace was populated with only `plugin.json`,
+`skills/`, and a repo-scoped `.agents/plugins/marketplace.json` pointing to the
+local copy. `codex plugin marketplace list` in that workspace showed only the
+host's globally configured marketplaces; `codex plugin list` did not show
+Jobra. The host did not expose an isolated install destination, so no plugin
+was installed into the user's global cache or settings. **Installation, skill
+discovery, and `$jobra` invocation remain unverified.** The earlier real-user
+test followed repository skill instructions directly; it did not prove
+installed-skill activation.
+
+## Manual installation acceptance
+
+The [official local marketplace procedure](https://developers.openai.com/plugins/build/plugins)
+and [complete-plugin test guidance](https://developers.openai.com/plugins/deploy/connect-chatgpt)
+require an installed plugin and a new conversation for behavioral verification:
+
+1. Create a clean local test Git workspace. Copy only this repository's
+   `plugin.json` and `skills/` to `plugins/jobra/` in that workspace. Do not copy
+   `.jobra/`, real CVs, or private operation files.
+2. Add the README's `jobra-dev` catalog at
+   `.agents/plugins/marketplace.json`, with source path `./plugins/jobra`.
+   Restart the desktop app, open the test workspace, choose `jobra-dev` in the
+   Plugins Directory, and install Jobra. Verify that the installed plugin lists
+   one `jobra` skill.
+3. Start a **new conversation** in that workspace. Select or invoke `$jobra`
+   with `setup` and a synthetic local TXT resume. Confirm that it asks for the
+   resume path and access approval, saves an unverified draft under ignored
+   `.jobra/`, and never transmits the file to a job platform.
+4. Invoke `$jobra profile` on that draft. Confirm that it shows evidence and
+   review states, supports a multi-decision batch yielding one snapshot, and
+   leaves the profile draft until a **separate** explicit final approval.
+   Confirm that `research` reports its current unimplemented status rather than
+   running job discovery.
+5. Repeat the `setup` and `profile` checks in an existing conversation after
+   installation. Record the desktop/CLI version, marketplace visibility,
+   installed plugin and skill visibility, invocation result, and any errors.
+   Claim discovery only after observing it in the skill picker or invocation.
+
+No user settings were modified during this Task 3.1 check. If a supported host
+cannot load the portable package, investigate that exact failure before adding
+a compatibility manifest.
 
 Older clients and public-directory submission are not validated. A compatibility
 overlay should be added only if a supported host actually requires it. Public

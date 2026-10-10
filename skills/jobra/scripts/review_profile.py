@@ -174,8 +174,41 @@ def apply_review_operation(profile: object, operation: object) -> dict:
     return result
 
 
+def apply_review_batch(profile: object, operations: object) -> dict:
+    """Apply ordered review decisions in memory; publish nothing on failure.
+
+Final approval is deliberately not a batch action. It must arrive as a
+separate, explicit single-operation request after review is complete.
+"""
+    if validate_document(profile, "candidate_profile"):
+        raise ReviewError("invalid_profile")
+    if profile["verification_status"] != "draft":
+        raise ReviewError("verified_profile_locked")
+    if not isinstance(operations, list) or not operations:
+        raise ReviewError("invalid_batch")
+    result = profile
+    for operation in operations:
+        if not isinstance(operation, dict):
+            raise ReviewError("invalid_batch")
+        if operation.get("action") == "finalize":
+            raise ReviewError("batch_finalization_forbidden")
+        result = apply_review_operation(result, operation)
+    if validate_document(result, "candidate_profile") or result["verification_status"] != "draft":
+        raise ReviewError("invalid_review_result")
+    return result
+
+
+def apply_review_request(profile: object, request: object) -> dict:
+    """Accept legacy single operations or an exact {operations: [...]} batch."""
+    if isinstance(request, dict) and "operations" in request:
+        if set(request) != {"operations"}:
+            raise ReviewError("invalid_batch")
+        return apply_review_batch(profile, request["operations"])
+    return apply_review_operation(profile, request)
+
+
 def save_review_operation(profile_path: Path, operation_path: Path, workspace: Path) -> Path:
-    """Read private operation and profile, then publish a validated new snapshot."""
+    """Read a private single or batch request, then publish one valid snapshot."""
     root = Path(workspace).resolve()
     private = root / ".jobra"
     profiles = private / "profiles"
@@ -188,7 +221,7 @@ def save_review_operation(profile_path: Path, operation_path: Path, workspace: P
         operation = json.loads(request.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError):
         raise ReviewError("unreadable_json") from None
-    result = apply_review_operation(profile, operation)
+    result = apply_review_request(profile, operation)
     prefix = "verified" if result["verification_status"] == "verified" else "review"
     try:
         return write_private_json_atomic(root, "profiles", f"{prefix}-{uuid4().hex}.json", result)
@@ -197,7 +230,7 @@ def save_review_operation(profile_path: Path, operation_path: Path, workspace: P
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Apply one explicit Jobra profile review operation")
+    parser = argparse.ArgumentParser(description="Apply a single or batched Jobra profile review request")
     parser.add_argument("profile_json", type=Path)
     parser.add_argument("operation_json", type=Path)
     parser.add_argument("--workspace", type=Path, default=Path.cwd())

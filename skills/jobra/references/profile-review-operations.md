@@ -1,8 +1,10 @@
 # Profile review operations
 
-Each private operation file contains one JSON object. Supply it and the latest
-profile snapshot to `review_profile.py`; the result is a new immutable snapshot.
-Values below are synthetic. Record IDs and evidence IDs come from the profile.
+Each private request file contains either one operation object or an object
+with a nonempty ordered `operations` array. Supply it and the latest profile
+snapshot to `review_profile.py`; one successful request produces one new
+immutable snapshot. Values below are synthetic. Record IDs and evidence IDs
+come from the profile.
 
 ```json
 {"action":"review_evidence","evidence_id":"ev_school","decision":"confirmed"}
@@ -37,3 +39,22 @@ for the operation; it is not an identity or consent proof.
 `correct_record` also supports `remove_fields` for optional section fields, such
 as an unsupported `period`; required fields cannot be removed. Correction fields
 must be explicitly supplied by the user, never invented from resume text.
+
+For multiple decisions already made by the user, batch them in dependency
+order. The same operations and invariants apply to each item:
+
+```json
+{
+  "operations": [
+    {"action":"review_evidence","evidence_id":"ev_school","decision":"confirmed"},
+    {"action":"confirm_record","section":"education","record_id":"edu_1"},
+    {"action":"confirm_section","section":"education"}
+  ]
+}
+```
+
+The complete batch is validated in memory before a single atomic snapshot is
+published. If any operation fails, the whole request fails and no snapshot is
+created. The original and all historical snapshots remain untouched. A batch
+cannot contain `finalize`, even with `approved: true`; finalization is a
+separate, explicitly approved single operation after the review summary.

@@ -17,14 +17,16 @@ The deterministic entry point is `skills/jobra/scripts/review_profile.py`:
   --workspace .
 ```
 
-The operation file must live under the ignored `.jobra/` directory. The script
-validates the input profile, applies one decision to a copy, validates the
-result with the existing JSON Schema and cross-record checks, then atomically
-publishes a new private `.jobra/profiles/` snapshot. It never overwrites an
-existing file. If a decision fails, no snapshot is created. Its terminal output
-contains only a status and relative path; errors are fixed codes without CV
-text. Keep private operation files local and remove obsolete ones according to
-your own retention preference.
+The request file must live under the ignored `.jobra/` directory. It may hold
+one legacy operation or a nonempty ordered `{"operations": [...]}` batch. The
+script validates the input, applies each decision to an in-memory copy using
+the existing JSON Schema and cross-record checks, and validates the final
+result before atomically publishing **one** private `.jobra/profiles/` snapshot
+per successful request. A failed decision rejects the whole batch: no partial
+profile update or output snapshot is written. It never overwrites or deletes an
+existing file. Its terminal output contains only a status and relative path;
+errors are fixed codes without CV text. Keep private request files local and
+manage historical snapshots according to your own retention preference.
 
 `origin: extracted` and evidence references survive a user correction. A
 user-added fact has `origin: user`, no extracted evidence, and begins `pending`.
@@ -33,7 +35,8 @@ records remain in snapshots for audit, while `records_for_downstream` excludes
 them from the verified candidate view. A change to a section reopens its review.
 All five sections require explicit confirmation, including empty ones.
 
-Final approval is represented by the user's explicit answer in the Codex
+Batch requests cannot contain `finalize` and cannot substitute for final user
+approval. Final approval is represented by the user's explicit answer in the Codex
 conversation and the `{"action":"finalize","approved":true}` operation that
 produces a verified snapshot. The profile schema does not store an approver
 identity or an approval transcript; the local script cannot authenticate a

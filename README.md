@@ -6,7 +6,7 @@ explainable opportunity recommendations. Users review opportunities and apply
 themselves; Jobra must never automatically submit applications.
 
 **Status: early development (`0.0.1`).** Local resume extraction, candidate
-drafts, and explicit profile review are available. Job research, matching,
+drafts, and batched human profile review are available. Job research, matching,
 and saved job results are not implemented.
 
 ## Design
@@ -49,9 +49,12 @@ arguments, not shell commands or separate skills. `setup` creates an unverified
 draft, and `profile` guides human verification. `research` and `results` remain
 planned.
 
-Marketplace availability varies by host. Older hosts may need a compatibility
-manifest; support for them is not claimed. Installation and fresh-chat discovery
-still need a host smoke test. This setup does not change user plugin settings.
+Marketplace availability varies by host. The package and skill structure pass
+local validation, but installation, fresh-chat skill discovery, and skill
+invocation remain unverified on this host. Follow the
+[manual installation acceptance test](docs/validation.md#manual-installation-acceptance)
+before claiming the installed plugin works. Older hosts may need a compatibility
+manifest; add one only after observing a specific failure.
 
 ## Privacy and development
 
@@ -74,6 +77,7 @@ when they contain useful material. The [candidate data contract](docs/candidate-
 defines profile and preference documents. [Resume ingestion](docs/resume-ingestion.md)
 documents the local extraction and draft workflow.
 
-See [profile review](docs/profile-review.md) for the review utility and safety
-rules. The project is intended for open-source release. A license must be selected and
-added before release; this version does not declare one.
+See [profile review](docs/profile-review.md) for batch operations, atomicity,
+privacy, and verified-profile immutability. The project is intended for
+open-source release. A license must be selected and added before release; this
+version does not declare one.
