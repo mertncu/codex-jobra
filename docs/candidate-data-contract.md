@@ -59,9 +59,9 @@ confirmed all five `section_reviews`, including empty sections, and no record or
 evidence remains `pending`. Accepted records must have accepted supporting
 evidence; rejected evidence cannot support an accepted record. This supports a
 complete review without forcing the user to accept every extracted claim.
-External workflow code must run the invariant helper before writing a verified
-profile, and should derive the status from actual review actions. The current
-task provides the contract and checker; it does not implement that workflow.
+External workflow code must run validation before writing a verified profile,
+and should derive the status from actual review actions. The `setup` workflow
+can save an unverified draft; user review and verification remain unimplemented.
 
 Search preferences include preferred and excluded roles, locations, work
 arrangements, and seniority. Empty lists mean unspecified, not inferred from

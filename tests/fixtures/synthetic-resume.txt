@@ -1,0 +1,7 @@
+Example University - BSc Computer Science
+
+Software intern at Example Studio
+
+Built a sample task tracker with Python
+
+Python

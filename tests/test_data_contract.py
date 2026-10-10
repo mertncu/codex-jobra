@@ -1,4 +1,4 @@
-"""Synthetic contract tests. Run with Python unittest; jsonschema is test-only."""
+"""Synthetic contract tests. Run with Python unittest."""
 
 import copy
 import importlib.util

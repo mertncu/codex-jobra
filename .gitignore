@@ -19,6 +19,8 @@ results/
 *.docx
 *.odt
 *.rtf
+!tests/fixtures/synthetic-resume.pdf
+!tests/fixtures/synthetic-resume.docx
 
 # Credentials and local configuration
 .env
