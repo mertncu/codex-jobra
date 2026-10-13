@@ -6,8 +6,9 @@ explainable opportunity recommendations. Users review opportunities and apply
 themselves; Jobra must never automatically submit applications.
 
 **Status: early development (`0.0.1`).** Local resume extraction, candidate
-drafts, and batched human profile review are available. Job research, matching,
-and saved job results are not implemented.
+drafts, batched human profile review, and an agent-driven discovery workflow
+are available. Discovery requires approved preferences and live Codex web tools;
+candidate matching is not implemented.
 
 ## Design
 
@@ -44,7 +45,7 @@ Add this catalog at `.agents/plugins/marketplace.json` in that workspace
 
 Restart the desktop app, open that workspace, select `jobra-dev` in the Plugins
 Directory, and install Jobra. Select its `jobra` skill and supply `setup`,
-`profile`, `research`, or `results` as task text. These are intended skill
+`profile`, `discover`, `research`, or `results` as task text. These are intended skill
 arguments, not shell commands or separate skills. `setup` creates an unverified
 draft, and `profile` guides human verification. `research` and `results` remain
 planned.
@@ -86,3 +87,8 @@ Candidate Intelligence evaluation is available as a small, synthetic golden
 dataset and deterministic scorer. See [the evaluation workflow](evaluation/README.md)
 and its [example report](evaluation/example-report.md). No Codex extraction
 accuracy is claimed until independently generated predictions are evaluated.
+
+The [opportunity data contract](docs/opportunity-data-contract.md) supports
+validation and atomic local snapshots of sourced job listings. The
+[discover workflow](docs/opportunity-discovery.md) uses Codex web tools with
+approved preferences. Candidate matching remains unimplemented.
