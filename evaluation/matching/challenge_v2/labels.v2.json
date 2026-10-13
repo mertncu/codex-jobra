@@ -1,0 +1,332 @@
+{
+  "cases": [
+    {
+      "case_id": "case_01",
+      "hard_filter_violations": [],
+      "required_uncertainties": [],
+      "requirements": [
+        {
+          "candidate_evidence_ids": [
+            "ev_skill",
+            "ev_project"
+          ],
+          "evidence_support": "supported",
+          "expected": "matched",
+          "id": "r1",
+          "job_evidence_ids": [
+            "job_01_evidence_01"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "case_02",
+      "hard_filter_violations": [],
+      "required_uncertainties": [],
+      "requirements": [
+        {
+          "candidate_evidence_ids": [],
+          "evidence_support": "unsupported",
+          "expected": "not_evidenced",
+          "id": "r1",
+          "job_evidence_ids": [
+            "job_02_evidence_01"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "case_03",
+      "hard_filter_violations": [],
+      "required_uncertainties": [],
+      "requirements": [
+        {
+          "candidate_evidence_ids": [
+            "ev_no_aws"
+          ],
+          "evidence_support": "supported",
+          "expected": "contradicted",
+          "id": "r1",
+          "job_evidence_ids": [
+            "job_03_evidence_01"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "case_04",
+      "hard_filter_violations": [],
+      "required_uncertainties": [],
+      "requirements": [
+        {
+          "candidate_evidence_ids": [
+            "ev_skill"
+          ],
+          "evidence_support": "ambiguous",
+          "expected": "inferred_support",
+          "id": "r1",
+          "job_evidence_ids": [
+            "job_04_evidence_01"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "case_05",
+      "hard_filter_violations": [],
+      "required_uncertainties": [
+        "seniority_or_experience_alignment_uncertain"
+      ],
+      "requirements": [
+        {
+          "candidate_evidence_ids": [],
+          "evidence_support": "unsupported",
+          "expected": "not_evidenced",
+          "id": "r1",
+          "job_evidence_ids": [
+            "job_05_evidence_01"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "case_06",
+      "hard_filter_violations": [],
+      "required_uncertainties": [
+        "seniority_or_experience_alignment_uncertain"
+      ],
+      "requirements": [
+        {
+          "candidate_evidence_ids": [],
+          "evidence_support": "ambiguous",
+          "expected": "cannot_assess",
+          "id": "r1",
+          "job_evidence_ids": [
+            "job_06_evidence_01"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "case_07",
+      "hard_filter_violations": [
+        "Sales Engineer"
+      ],
+      "required_uncertainties": [],
+      "requirements": [
+        {
+          "candidate_evidence_ids": [
+            "ev_skill"
+          ],
+          "evidence_support": "supported",
+          "expected": "matched",
+          "id": "r1",
+          "job_evidence_ids": [
+            "job_07_evidence_01"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "case_08",
+      "hard_filter_violations": [],
+      "required_uncertainties": [
+        "location_or_remote_eligibility_uncertain"
+      ],
+      "requirements": [
+        {
+          "candidate_evidence_ids": [
+            "ev_skill"
+          ],
+          "evidence_support": "supported",
+          "expected": "matched",
+          "id": "r1",
+          "job_evidence_ids": [
+            "job_08_evidence_01"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "case_09",
+      "hard_filter_violations": [],
+      "required_uncertainties": [
+        "seniority_or_experience_alignment_uncertain"
+      ],
+      "requirements": [
+        {
+          "candidate_evidence_ids": [],
+          "evidence_support": "ambiguous",
+          "expected": "cannot_assess",
+          "id": "r1",
+          "job_evidence_ids": [
+            "job_09_evidence_01",
+            "job_09_evidence_02"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "case_10",
+      "hard_filter_violations": [],
+      "required_uncertainties": [
+        "application_status_unknown",
+        "work_arrangement_unknown"
+      ],
+      "requirements": [
+        {
+          "candidate_evidence_ids": [
+            "ev_skill"
+          ],
+          "evidence_support": "supported",
+          "expected": "matched",
+          "id": "r1",
+          "job_evidence_ids": [
+            "job_10_evidence_01"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "case_11",
+      "hard_filter_violations": [],
+      "required_uncertainties": [
+        "seniority_or_experience_alignment_uncertain"
+      ],
+      "requirements": [
+        {
+          "candidate_evidence_ids": [
+            "ev_aws"
+          ],
+          "evidence_support": "ambiguous",
+          "expected": "cannot_assess",
+          "id": "r1",
+          "job_evidence_ids": [
+            "job_11_evidence_01"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "case_12",
+      "hard_filter_violations": [],
+      "required_uncertainties": [],
+      "requirements": [
+        {
+          "candidate_evidence_ids": [
+            "ev_skill",
+            "ev_project"
+          ],
+          "evidence_support": "supported",
+          "expected": "matched",
+          "id": "r1",
+          "job_evidence_ids": [
+            "job_12_evidence_01"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "case_13",
+      "hard_filter_violations": [],
+      "required_uncertainties": [],
+      "requirements": [
+        {
+          "candidate_evidence_ids": [],
+          "evidence_support": "ambiguous",
+          "expected": "cannot_assess",
+          "id": "r1",
+          "job_evidence_ids": [
+            "job_13_evidence_01",
+            "job_13_conflict"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "case_14",
+      "hard_filter_violations": [],
+      "required_uncertainties": [],
+      "requirements": [
+        {
+          "candidate_evidence_ids": [],
+          "evidence_support": "unsupported",
+          "expected": "not_evidenced",
+          "id": "r1",
+          "job_evidence_ids": [
+            "job_14_evidence_01"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "case_15",
+      "hard_filter_violations": [],
+      "required_uncertainties": [],
+      "requirements": [
+        {
+          "candidate_evidence_ids": [],
+          "evidence_support": "unsupported",
+          "expected": "not_evidenced",
+          "id": "r1",
+          "job_evidence_ids": [
+            "job_15_evidence_01"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "case_16",
+      "hard_filter_violations": [],
+      "required_uncertainties": [],
+      "requirements": [
+        {
+          "candidate_evidence_ids": [],
+          "evidence_support": "unsupported",
+          "expected": "not_evidenced",
+          "id": "r1",
+          "job_evidence_ids": [
+            "job_16_evidence_01"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "case_17",
+      "hard_filter_violations": [
+        "Data Entry"
+      ],
+      "required_uncertainties": [],
+      "requirements": [
+        {
+          "candidate_evidence_ids": [],
+          "evidence_support": "unsupported",
+          "expected": "not_evidenced",
+          "id": "r1",
+          "job_evidence_ids": [
+            "job_17_evidence_01"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "case_18",
+      "hard_filter_violations": [],
+      "required_uncertainties": [
+        "seniority_or_experience_alignment_uncertain"
+      ],
+      "requirements": [
+        {
+          "candidate_evidence_ids": [],
+          "evidence_support": "ambiguous",
+          "expected": "cannot_assess",
+          "id": "r1",
+          "job_evidence_ids": [
+            "job_18_evidence_01"
+          ]
+        }
+      ]
+    }
+  ],
+  "gold_version": "matching-challenge-golden-v2"
+}

@@ -106,3 +106,5 @@ is observed.
 For candidate–opportunity matching evaluation, see the separate [synthetic
 benchmark, scoring methodology, and example reports](matching/README.md). It
 does not use the Candidate Intelligence golden labels or private pilot files.
+The [V0.2.1 blind matching challenge](matching/challenge_v2/README.md) records
+its clean-session procedure, frozen hashes, results, and failure register.

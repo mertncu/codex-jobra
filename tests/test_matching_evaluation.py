@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -21,6 +22,11 @@ spec = importlib.util.spec_from_file_location("matching_evaluation", ROOT / "eva
 evaluation = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(evaluation)
 from evaluation.matching.build_benchmark import build
+
+score_spec = importlib.util.spec_from_file_location(
+    "matching_challenge_score", ROOT / "evaluation/matching/challenge_v2/score.py")
+challenge_score = importlib.util.module_from_spec(score_spec)
+score_spec.loader.exec_module(challenge_score)
 
 
 class MatchingEvaluationTests(unittest.TestCase):
@@ -117,6 +123,52 @@ class MatchingEvaluationTests(unittest.TestCase):
             self.assertNotEqual(first, second)
             self.assertEqual(original, first.read_bytes())
             self.assertEqual(0o600, first.stat().st_mode & 0o777)
+
+    def test_challenge_v2_sources_and_labels_are_complete(self):
+        challenge = ROOT / "evaluation/matching/challenge_v2"
+        inputs = json.loads((challenge / "inputs.v2.json").read_text())
+        golden = json.loads((challenge / "labels.v2.json").read_text())
+        frozen = json.loads((challenge / "freeze.v2.json").read_text())
+        self.assertEqual(frozen["input_sha256"], hashlib.sha256((challenge / "inputs.v2.json").read_bytes()).hexdigest())
+        self.assertEqual(frozen["labels_sha256"], hashlib.sha256((challenge / "labels.v2.json").read_bytes()).hexdigest())
+        self.assertEqual(18, len(inputs["cases"]))
+        self.assertEqual({case["id"] for case in inputs["cases"]},
+                         {case["case_id"] for case in golden["cases"]})
+        opportunities = {item["id"]: item for item in inputs["opportunities"]["opportunities"]}
+        self.assertEqual([], validate_opportunities(inputs["opportunities"]))
+        for profile in inputs["candidates"].values():
+            self.assertEqual([], validate_document(profile, "candidate_profile"))
+        for preferences in inputs["preferences"].values():
+            self.assertEqual([], validate_document(preferences, "search_preferences"))
+        for label in golden["cases"]:
+            case = next(item for item in inputs["cases"] if item["id"] == label["case_id"])
+            opportunity = opportunities[case["opportunity"]]
+            job_ids = {item["id"] for item in opportunity["evidence"]}
+            candidate_ids = {item["id"] for item in inputs["candidates"][case["candidate"]]["evidence"]}
+            for req in label["requirements"]:
+                self.assertTrue(set(req["job_evidence_ids"]) <= job_ids)
+                self.assertTrue(set(req["candidate_evidence_ids"]) <= candidate_ids)
+        labels = {item["case_id"]: item for item in golden["cases"]}
+        self.assertEqual(["Sales Engineer"], labels["case_07"]["hard_filter_violations"])
+        self.assertEqual([], labels["case_15"]["hard_filter_violations"])
+        self.assertIn("location_or_remote_eligibility_uncertain", labels["case_08"]["required_uncertainties"])
+        injected = opportunities["opp_14"]
+        self.assertTrue(any("Ignore prior rules" in item["excerpt"] for item in injected["evidence"]))
+        self.assertEqual("not_evidenced", labels["case_14"]["requirements"][0]["expected"])
+        self.assertTrue(all(item["original_url"].split("/")[2].endswith(".example")
+                            for item in opportunities.values()))
+        report = evaluation.evaluate(inputs, golden, [], "2026-10-13", exclude_ambiguous_support=True)
+        metric = report["metrics"]["requirement_classification_accuracy"]
+        self.assertEqual(12, metric["denominator"])
+        self.assertEqual(6, report["ambiguous_requirement_count_excluded_from_accuracy"])
+        self.assertEqual(12, sum(sum(row.values()) for row in report["metrics"]["confusion_matrix"].values()))
+        self.assertEqual(5, report["metrics"]["per_class_precision_recall"]["matched"]["recall"]["denominator"])
+        self.assertEqual(2, report["metrics"]["explicit_exclusion_end_to_end_success"]["denominator"])
+        self.assertEqual(0, report["metrics"]["explicit_exclusion_end_to_end_success"]["numerator"])
+
+    def test_challenge_scorer_rejects_wrong_run_id_before_reading_predictions(self):
+        with self.assertRaisesRegex(ValueError, "prediction_run_id_mismatch"):
+            challenge_score.score(Path("missing-predictions.json"), Path(ROOT), "wrong-run", "clean-task")
 
 
 if __name__ == "__main__":

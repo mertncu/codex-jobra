@@ -42,7 +42,9 @@ missing predicted requirements count as errors. Precision/recall treat
 `matched` and `inferred_support` as positive, with inferred support kept
 separate in the confusion matrix. Evidence-reference validity is the fraction
 of attempted assessment cases whose requirement, experience, and career
-references all exist and link to accepted records. Evidence-support accuracy is a
+references all exist and link to accepted records, with candidate references
+consistent with the outcome (for example, `not_evidenced` has no candidate
+references). Evidence-support accuracy is a
 separate strict check against independently specified expected candidate
 evidence IDs; ambiguous gold support is excluded and counted separately.
 Missing benchmark predictions appear as a `missing_prediction` confusion column.

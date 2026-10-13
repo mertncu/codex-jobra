@@ -1,0 +1,8 @@
+{
+  "benchmark_version": "matching-challenge-v2",
+  "prediction_run_id": "a9f657cb474e452b978366b77a18f2ee",
+  "frozen_at_utc": "2026-10-13T13:45:08+00:00",
+  "input_sha256": "1d97e3443e933a14bf0932eeb92ca5198273eeaa0ce7a708f72a9445a61c2cf3",
+  "labels_sha256": "26de98f623b833df4434531be618a84c3fe89319cd3fa89cd031f2acc684d4a3",
+  "case_count": 18
+}

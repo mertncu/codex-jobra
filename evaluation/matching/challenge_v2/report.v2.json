@@ -1,0 +1,502 @@
+{
+  "report_version": "matching-blind-challenge-v2",
+  "dataset_version": "matching-challenge-v2",
+  "gold_version": "matching-challenge-golden-v2",
+  "evaluation_date": "2026-10-13",
+  "case_count": 18,
+  "prediction_attempts": 18,
+  "missing_prediction_cases": [],
+  "unmatched_prediction_requirement_count": 2,
+  "unmatched_positive_prediction_count_unadjudicated": 1,
+  "ambiguous_requirement_count_excluded_from_accuracy": 6,
+  "evaluation_context": {
+    "status": "separate_clean_projectless_codex_task",
+    "prediction_session_id": "01a13583-8203-71d1-82c4-a883017c9739",
+    "note": "The prediction task received the frozen synthetic inputs and documented matching contract only; it had no repository, labels, prior reports, or evaluator output."
+  },
+  "metrics": {
+    "requirement_classification_accuracy": {
+      "numerator": 11,
+      "denominator": 12,
+      "rate": 0.9166666666666666
+    },
+    "supported_match_precision": {
+      "numerator": 5,
+      "denominator": 5,
+      "rate": 1.0
+    },
+    "supported_match_recall": {
+      "numerator": 5,
+      "denominator": 5,
+      "rate": 1.0
+    },
+    "confusion_matrix": {
+      "matched": {
+        "matched": 4,
+        "inferred_support": 1,
+        "not_evidenced": 0,
+        "contradicted": 0,
+        "cannot_assess": 0,
+        "missing_prediction": 0
+      },
+      "inferred_support": {
+        "matched": 0,
+        "inferred_support": 0,
+        "not_evidenced": 0,
+        "contradicted": 0,
+        "cannot_assess": 0,
+        "missing_prediction": 0
+      },
+      "not_evidenced": {
+        "matched": 0,
+        "inferred_support": 0,
+        "not_evidenced": 6,
+        "contradicted": 0,
+        "cannot_assess": 0,
+        "missing_prediction": 0
+      },
+      "contradicted": {
+        "matched": 0,
+        "inferred_support": 0,
+        "not_evidenced": 0,
+        "contradicted": 1,
+        "cannot_assess": 0,
+        "missing_prediction": 0
+      },
+      "cannot_assess": {
+        "matched": 0,
+        "inferred_support": 0,
+        "not_evidenced": 0,
+        "contradicted": 0,
+        "cannot_assess": 0,
+        "missing_prediction": 0
+      }
+    },
+    "per_class_precision_recall": {
+      "matched": {
+        "precision": {
+          "numerator": 4,
+          "denominator": 4,
+          "rate": 1.0
+        },
+        "recall": {
+          "numerator": 4,
+          "denominator": 5,
+          "rate": 0.8
+        }
+      },
+      "inferred_support": {
+        "precision": {
+          "numerator": 0,
+          "denominator": 1,
+          "rate": 0.0
+        },
+        "recall": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        }
+      },
+      "not_evidenced": {
+        "precision": {
+          "numerator": 6,
+          "denominator": 6,
+          "rate": 1.0
+        },
+        "recall": {
+          "numerator": 6,
+          "denominator": 6,
+          "rate": 1.0
+        }
+      },
+      "contradicted": {
+        "precision": {
+          "numerator": 1,
+          "denominator": 1,
+          "rate": 1.0
+        },
+        "recall": {
+          "numerator": 1,
+          "denominator": 1,
+          "rate": 1.0
+        }
+      },
+      "cannot_assess": {
+        "precision": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "recall": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        }
+      }
+    },
+    "evidence_reference_validity": {
+      "numerator": 10,
+      "denominator": 18,
+      "rate": 0.5555555555555556
+    },
+    "evidence_support_accuracy_adjudicated_only": {
+      "numerator": 3,
+      "denominator": 12,
+      "rate": 0.25
+    },
+    "ambiguous_evidence_support_unadjudicated": 6,
+    "hard_filter_correctness": {
+      "numerator": 4,
+      "denominator": 18,
+      "rate": 0.2222222222222222
+    },
+    "hard_filter_correctness_when_aggregated": {
+      "numerator": 4,
+      "denominator": 4,
+      "rate": 1.0
+    },
+    "explicit_exclusion_end_to_end_success": {
+      "numerator": 0,
+      "denominator": 2,
+      "rate": 0.0
+    },
+    "explicit_exclusion_case_coverage": {
+      "numerator": 0,
+      "denominator": 2,
+      "rate": 0.0
+    },
+    "explicit_exclusion_accuracy_when_scored": {
+      "numerator": 0,
+      "denominator": 0,
+      "rate": null
+    },
+    "false_unsupported_match_rate": {
+      "numerator": 0,
+      "denominator": 5,
+      "rate": 0.0
+    },
+    "not_evidenced_handling_recall": {
+      "numerator": 6,
+      "denominator": 6,
+      "rate": 1.0
+    },
+    "explanation_completeness_structural": {
+      "numerator": 4,
+      "denominator": 18,
+      "rate": 0.2222222222222222
+    },
+    "schema_invariant_compliance": {
+      "numerator": 4,
+      "denominator": 18,
+      "rate": 0.2222222222222222
+    },
+    "deterministic_aggregation_reproducibility": {
+      "numerator": 4,
+      "denominator": 18,
+      "rate": 0.2222222222222222
+    }
+  },
+  "per_case": [
+    {
+      "case_id": "case_01",
+      "status": "evaluated",
+      "requirements": 1,
+      "exact_category_correct": 1,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_02",
+      "status": "invalid_prediction",
+      "requirements": 1,
+      "exact_category_correct": 1,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": false,
+      "hard_filter_correct": null,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": [
+        "schema_or_invariant_failure:not_evidenced_requirement_has_candidate_reference"
+      ]
+    },
+    {
+      "case_id": "case_03",
+      "status": "evaluated",
+      "requirements": 1,
+      "exact_category_correct": 1,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_04",
+      "status": "invalid_prediction",
+      "requirements": 1,
+      "exact_category_correct": 0,
+      "category_denominator": 0,
+      "ambiguous_requirements_excluded": 1,
+      "hard_filter_checked": false,
+      "hard_filter_correct": null,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": [
+        "schema_or_invariant_failure:not_evidenced_requirement_has_candidate_reference"
+      ]
+    },
+    {
+      "case_id": "case_05",
+      "status": "invalid_prediction",
+      "requirements": 1,
+      "exact_category_correct": 1,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": false,
+      "hard_filter_correct": null,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [
+        "seniority_or_experience_alignment_uncertain"
+      ],
+      "failure_categories": [
+        "schema_or_invariant_failure:unknown_preference_reference",
+        "required_uncertainty_warning_missing"
+      ]
+    },
+    {
+      "case_id": "case_06",
+      "status": "invalid_prediction",
+      "requirements": 1,
+      "exact_category_correct": 0,
+      "category_denominator": 0,
+      "ambiguous_requirements_excluded": 1,
+      "hard_filter_checked": false,
+      "hard_filter_correct": null,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [
+        "seniority_or_experience_alignment_uncertain"
+      ],
+      "failure_categories": [
+        "schema_or_invariant_failure:unknown_preference_reference",
+        "required_uncertainty_warning_missing"
+      ]
+    },
+    {
+      "case_id": "case_07",
+      "status": "invalid_prediction",
+      "requirements": 1,
+      "exact_category_correct": 0,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": false,
+      "hard_filter_correct": null,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": [
+        "schema_or_invariant_failure:unknown_preference_reference"
+      ]
+    },
+    {
+      "case_id": "case_08",
+      "status": "invalid_prediction",
+      "requirements": 1,
+      "exact_category_correct": 1,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": false,
+      "hard_filter_correct": null,
+      "unmatched_prediction_requirement_ids": [
+        "r2"
+      ],
+      "missing_uncertainties": [
+        "location_or_remote_eligibility_uncertain"
+      ],
+      "failure_categories": [
+        "schema_or_invariant_failure:unknown_preference_reference",
+        "required_uncertainty_warning_missing"
+      ]
+    },
+    {
+      "case_id": "case_09",
+      "status": "invalid_prediction",
+      "requirements": 1,
+      "exact_category_correct": 0,
+      "category_denominator": 0,
+      "ambiguous_requirements_excluded": 1,
+      "hard_filter_checked": false,
+      "hard_filter_correct": null,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [
+        "seniority_or_experience_alignment_uncertain"
+      ],
+      "failure_categories": [
+        "schema_or_invariant_failure:unknown_preference_reference",
+        "required_uncertainty_warning_missing"
+      ]
+    },
+    {
+      "case_id": "case_10",
+      "status": "evaluated",
+      "requirements": 1,
+      "exact_category_correct": 1,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_11",
+      "status": "invalid_prediction",
+      "requirements": 1,
+      "exact_category_correct": 0,
+      "category_denominator": 0,
+      "ambiguous_requirements_excluded": 1,
+      "hard_filter_checked": false,
+      "hard_filter_correct": null,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [
+        "seniority_or_experience_alignment_uncertain"
+      ],
+      "failure_categories": [
+        "schema_or_invariant_failure:unknown_preference_reference",
+        "required_uncertainty_warning_missing"
+      ]
+    },
+    {
+      "case_id": "case_12",
+      "status": "evaluated",
+      "requirements": 1,
+      "exact_category_correct": 1,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [
+        "r2"
+      ],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_13",
+      "status": "invalid_prediction",
+      "requirements": 1,
+      "exact_category_correct": 0,
+      "category_denominator": 0,
+      "ambiguous_requirements_excluded": 1,
+      "hard_filter_checked": false,
+      "hard_filter_correct": null,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": [
+        "schema_or_invariant_failure:unknown_preference_reference"
+      ]
+    },
+    {
+      "case_id": "case_14",
+      "status": "invalid_prediction",
+      "requirements": 1,
+      "exact_category_correct": 1,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": false,
+      "hard_filter_correct": null,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": [
+        "schema_or_invariant_failure:not_evidenced_requirement_has_candidate_reference"
+      ]
+    },
+    {
+      "case_id": "case_15",
+      "status": "invalid_prediction",
+      "requirements": 1,
+      "exact_category_correct": 1,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": false,
+      "hard_filter_correct": null,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": [
+        "schema_or_invariant_failure:unknown_preference_reference"
+      ]
+    },
+    {
+      "case_id": "case_16",
+      "status": "invalid_prediction",
+      "requirements": 1,
+      "exact_category_correct": 1,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": false,
+      "hard_filter_correct": null,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": [
+        "schema_or_invariant_failure:unknown_preference_reference"
+      ]
+    },
+    {
+      "case_id": "case_17",
+      "status": "invalid_prediction",
+      "requirements": 1,
+      "exact_category_correct": 1,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": false,
+      "hard_filter_correct": null,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": [
+        "schema_or_invariant_failure:unknown_preference_reference"
+      ]
+    },
+    {
+      "case_id": "case_18",
+      "status": "invalid_prediction",
+      "requirements": 1,
+      "exact_category_correct": 0,
+      "category_denominator": 0,
+      "ambiguous_requirements_excluded": 1,
+      "hard_filter_checked": false,
+      "hard_filter_correct": null,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [
+        "seniority_or_experience_alignment_uncertain"
+      ],
+      "failure_categories": [
+        "schema_or_invariant_failure:unknown_preference_reference",
+        "required_uncertainty_warning_missing"
+      ]
+    }
+  ],
+  "limitations": [
+    "Small synthetic benchmark; no real-world performance or production-readiness claim.",
+    "Golden labels are frozen and independently authored but have not received independent human adjudication.",
+    "Evidence-support accuracy excludes ambiguous judgments; six support labels remain unadjudicated.",
+    "Explanations are checked for required structure, not semantic quality.",
+    "The earlier eight-opportunity live pilot is observational only and is not ground truth."
+  ],
+  "run_manifest": {
+    "benchmark_version": "matching-challenge-v2",
+    "prediction_run_id": "a9f657cb474e452b978366b77a18f2ee",
+    "input_sha256": "1d97e3443e933a14bf0932eeb92ca5198273eeaa0ce7a708f72a9445a61c2cf3",
+    "labels_sha256": "26de98f623b833df4434531be618a84c3fe89319cd3fa89cd031f2acc684d4a3",
+    "predictions_sha256": "290bcdf9f6b8a360a22dc54dae41a7aee9494cc5f16bd43e1fab9a2c3a54150e",
+    "frozen_at_utc": "2026-10-13T13:45:08+00:00",
+    "prediction_completed_at_utc": "2026-10-13T13:48:26+00:00",
+    "evaluated_at_utc": "2026-10-13T14:05:12+00:00"
+  }
+}

@@ -25,7 +25,7 @@ def _metric(numerator, denominator):
             "rate": numerator / denominator if denominator else None}
 
 
-def evaluate(benchmark, golden, predictions, evaluation_date):
+def evaluate(benchmark, golden, predictions, evaluation_date, *, exclude_ambiguous_support=False):
     cases = {item["id"]: item for item in benchmark["cases"]}
     candidate_gold = {item["case_id"]: item for item in golden["cases"]}
     candidate_predictions = {item["case_id"]: item for item in predictions}
@@ -35,17 +35,22 @@ def evaluate(benchmark, golden, predictions, evaluation_date):
     valid_cases = 0
     ref_valid = 0
     ref_total = 0
-    hard_ok = explanation_ok = aggregation_ok = 0
+    hard_ok = hard_scored = explanation_ok = aggregation_ok = 0
+    explicit_filter_total = sum(bool(item["hard_filter_violations"]) for item in golden["cases"])
+    explicit_filter_scored = explicit_filter_ok = 0
     support_ok = 0
     support_total = sum(1 for item in golden["cases"] for req in item["requirements"]
                         if req["evidence_support"] != "ambiguous")
     ambiguous = sum(1 for item in golden["cases"] for req in item["requirements"]
                     if req["evidence_support"] == "ambiguous")
-    false_unsupported = positive_predictions = 0
+    false_unsupported = positive_predictions = unmatched_positive = 0
     not_evidenced_ok = not_evidenced_total = 0
     confusion = {truth: {**{guess: 0 for guess in CATEGORIES}, "missing_prediction": 0}
                  for truth in CATEGORIES}
-    expected_requirement_count = sum(len(item["requirements"]) for item in golden["cases"])
+    ambiguous_requirement_count = sum(1 for item in golden["cases"] for req in item["requirements"]
+                                     if exclude_ambiguous_support and req["evidence_support"] == "ambiguous")
+    expected_requirement_count = sum(1 for item in golden["cases"] for req in item["requirements"]
+                                    if not exclude_ambiguous_support or req["evidence_support"] != "ambiguous")
     hard_total = explanation_total = len(cases)
     missed_supported = 0
     missing_predictions = sorted(set(cases) - set(candidate_predictions))
@@ -55,6 +60,8 @@ def evaluate(benchmark, golden, predictions, evaluation_date):
         if prediction is None or expected is None:
             if expected is not None:
                 for gold_req in expected["requirements"]:
+                    if exclude_ambiguous_support and gold_req["evidence_support"] == "ambiguous":
+                        continue
                     truth = gold_req["expected"]
                     confusion[truth]["missing_prediction"] += 1
                     if truth in POSITIVE:
@@ -76,9 +83,13 @@ def evaluate(benchmark, golden, predictions, evaluation_date):
             valid_cases += 1
             rebuilt = build_match_results(profile, preferences, one_document, assessment,
                                           evaluated_at=f"{evaluation_date}T00:00:00Z")
-        except (MatchError, ValueError):
+        except MatchError as exc:
             rebuilt = None
-            errors.append("schema_or_invariant_failure")
+            # MatchError contains a fixed validator code, never user content.
+            errors.append(f"schema_or_invariant_failure:{exc}")
+        except ValueError:
+            rebuilt = None
+            errors.append("validation_failure")
         if rebuilt is not None and actual_result is not None:
             # A caller may have used a different timestamp; compare substantive deterministic fields.
             got = actual_result.get("results", [])
@@ -95,9 +106,13 @@ def evaluate(benchmark, golden, predictions, evaluation_date):
         pred_reqs = {item["id"]: item for item in pred_assessment.get("requirements", [])}
         gold_reqs = {item["id"]: item for item in expected["requirements"]}
         case_correct = 0
+        case_scored = sum(1 for req in gold_reqs.values()
+                          if not exclude_ambiguous_support or req["evidence_support"] != "ambiguous")
         for req_id, gold_req in gold_reqs.items():
             pred_req = pred_reqs.get(req_id)
             if pred_req is None:
+                continue
+            if exclude_ambiguous_support and gold_req["evidence_support"] == "ambiguous":
                 continue
             truth, guess = gold_req["expected"], pred_req["outcome"]
             confusion[truth][guess] += 1
@@ -117,6 +132,7 @@ def evaluate(benchmark, golden, predictions, evaluation_date):
                                ((gold_req["evidence_support"] == "supported" and guess in POSITIVE | {"contradicted"}) or
                                 (gold_req["evidence_support"] == "unsupported" and not got_ids)))
         unmatched_ids = sorted(set(pred_reqs) - set(gold_reqs))
+        unmatched_positive += sum(pred_reqs[req_id]["outcome"] in POSITIVE for req_id in unmatched_ids)
         # Structural reference integrity spans requirement, experience, and
         # career assessments; semantic entailment is scored separately above.
         job_evidence = {item["id"] for item in opportunity["evidence"]}
@@ -137,9 +153,27 @@ def evaluate(benchmark, golden, predictions, evaluation_date):
             refs_valid_for_case &= (job_refs <= job_evidence and evidence_refs <= candidate_evidence and
                                     record_refs <= set(accepted_records) and
                                     (not record_refs or evidence_refs <= linked))
+        for req in pred_reqs.values():
+            record_refs = set(req.get("candidate_record_ids", []))
+            evidence_refs = set(req.get("candidate_evidence_ids", []))
+            if req.get("outcome") == "not_evidenced" and (record_refs or evidence_refs):
+                refs_valid_for_case = False
+            if req.get("outcome") in POSITIVE and (not record_refs or not evidence_refs):
+                refs_valid_for_case = False
+            if req.get("outcome") == "contradicted" and (
+                    not evidence_refs or any(profile_evidence["id"] in evidence_refs and
+                    profile_evidence["extraction"] != "explicit" for profile_evidence in profile["evidence"])):
+                refs_valid_for_case = False
         ref_total += 1
         ref_valid += refs_valid_for_case
-        hard_ok += set(output.get("hard_filter_violations", [])) == set(expected["hard_filter_violations"])
+        hard_checked = bool(output.get("opportunity_id"))
+        hard_correct = set(output.get("hard_filter_violations", [])) == set(expected["hard_filter_violations"])
+        if hard_checked:
+            hard_scored += 1
+            hard_ok += hard_correct
+            if expected["hard_filter_violations"]:
+                explicit_filter_scored += 1
+                explicit_filter_ok += hard_correct
         complete_explanation = bool(output.get("explanation")) and all(
             bool(req.get("rationale")) and bool(req.get("job_evidence_ids")) for req in pred_reqs.values())
         explanation_ok += complete_explanation
@@ -149,22 +183,39 @@ def evaluate(benchmark, golden, predictions, evaluation_date):
             errors.append("required_uncertainty_warning_missing")
         per_case.append({"case_id": case_id, "status": "evaluated" if rebuilt else "invalid_prediction",
                          "requirements": len(gold_reqs), "exact_category_correct": int(case_correct),
-                         "category_denominator": len(gold_reqs), "hard_filter_correct": set(output.get("hard_filter_violations", [])) == set(expected["hard_filter_violations"]),
+                         "category_denominator": case_scored,
+                         "ambiguous_requirements_excluded": sum(1 for req in gold_reqs.values()
+                             if exclude_ambiguous_support and req["evidence_support"] == "ambiguous"),
+                         "hard_filter_checked": hard_checked,
+                         "hard_filter_correct": hard_correct if hard_checked else None,
                          "unmatched_prediction_requirement_ids": unmatched_ids,
                          "missing_uncertainties": missing_warnings, "failure_categories": errors})
     tp = sum(guess in POSITIVE and truth in POSITIVE for truth, guess in flattened)
     fp = sum(guess in POSITIVE and truth not in POSITIVE for truth, guess in flattened)
     fn = sum(truth in POSITIVE and guess not in POSITIVE for truth, guess in flattened) + missed_supported
     exact = sum(truth == guess for truth, guess in flattened)
+    per_class = {}
+    for category in CATEGORIES:
+        true_positive = confusion[category][category]
+        false_positive_class = sum(confusion[truth][category] for truth in CATEGORIES if truth != category)
+        false_negative_class = sum(confusion[category][guess] for guess in CATEGORIES if guess != category)
+        false_negative_class += confusion[category]["missing_prediction"]
+        per_class[category] = {"precision": _metric(true_positive, true_positive + false_positive_class),
+                               "recall": _metric(true_positive, true_positive + false_negative_class)}
     metrics = {
         "requirement_classification_accuracy": _metric(exact, expected_requirement_count),
         "supported_match_precision": _metric(tp, tp + fp),
         "supported_match_recall": _metric(tp, tp + fn),
         "confusion_matrix": confusion,
+        "per_class_precision_recall": per_class,
         "evidence_reference_validity": _metric(ref_valid, ref_total),
         "evidence_support_accuracy_adjudicated_only": _metric(support_ok, support_total),
         "ambiguous_evidence_support_unadjudicated": ambiguous,
         "hard_filter_correctness": _metric(hard_ok, hard_total),
+        "hard_filter_correctness_when_aggregated": _metric(hard_ok, hard_scored),
+        "explicit_exclusion_end_to_end_success": _metric(explicit_filter_ok, explicit_filter_total),
+        "explicit_exclusion_case_coverage": _metric(explicit_filter_scored, explicit_filter_total),
+        "explicit_exclusion_accuracy_when_scored": _metric(explicit_filter_ok, explicit_filter_scored),
         "false_unsupported_match_rate": _metric(false_unsupported, positive_predictions),
         "not_evidenced_handling_recall": _metric(not_evidenced_ok, not_evidenced_total),
         "explanation_completeness_structural": _metric(explanation_ok, explanation_total),
@@ -175,6 +226,8 @@ def evaluate(benchmark, golden, predictions, evaluation_date):
             "gold_version": golden["gold_version"], "evaluation_date": evaluation_date,
             "case_count": len(cases), "prediction_attempts": attempted, "missing_prediction_cases": missing_predictions,
             "unmatched_prediction_requirement_count": sum(len(item.get("unmatched_prediction_requirement_ids", [])) for item in per_case),
+            "unmatched_positive_prediction_count_unadjudicated": unmatched_positive,
+            "ambiguous_requirement_count_excluded_from_accuracy": ambiguous_requirement_count,
             "evaluation_context": {"status": "executed_unblinded_same_codex_context",
                                    "note": "Codex created synthetic inputs and assessments in this task context; golden labels were stored separately and added after predictions, but there was no independent clean evaluation agent."},
             "metrics": metrics, "per_case": per_case,

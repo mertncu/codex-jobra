@@ -93,7 +93,11 @@ evaluation runner. See [matching evaluation methodology](evaluation/matching/REA
 and its [machine-readable](evaluation/matching/example-report.v1.json) and
 [human-readable](evaluation/matching/example-report.v1.md) example reports.
 The included Task 5 semantic run was unblinded within one Codex context and is
-not an independent agent-accuracy result.
+not an independent agent-accuracy result. The frozen [V0.2.1 challenge and
+blind-run procedure](evaluation/matching/challenge_v2/README.md) uses a
+separate projectless Codex task and preserves the V1 baseline. Its [blind
+results](evaluation/matching/challenge_v2/report.v2.md) and [failure
+register](evaluation/matching/challenge_v2/failure-register.v2.md) are available.
 
 The [opportunity data contract](docs/opportunity-data-contract.md) supports
 validation and atomic local snapshots of sourced job listings. The

@@ -1,0 +1,100 @@
+{
+  "report_version": "matching-repeatability-v2",
+  "benchmark_version": "matching-challenge-v2",
+  "created_at_utc": "2026-10-13T14:02:30+00:00",
+  "prediction_run_id": "a9f657cb474e452b978366b77a18f2ee",
+  "input_sha256": "1d97e3443e933a14bf0932eeb92ca5198273eeaa0ce7a708f72a9445a61c2cf3",
+  "labels_sha256": "26de98f623b833df4434531be618a84c3fe89319cd3fa89cd031f2acc684d4a3",
+  "primary_predictions_sha256": "290bcdf9f6b8a360a22dc54dae41a7aee9494cc5f16bd43e1fab9a2c3a54150e",
+  "repeat_predictions_sha256": "f41b6d350f8b25f8754762b849f06406ae97eea4688e07757fcc19389973dabe",
+  "primary_session_id": "01a13583-8203-71d1-82c4-a883017c9739",
+  "repeat_session_id": "01a13588-d130-7052-ac98-29423d2baef2",
+  "primary_session_completed_at_utc": "2026-10-13T13:48:26+00:00",
+  "repeat_session_completed_at_utc": "2026-10-13T13:52:54+00:00",
+  "repeat_cases_requested": 6,
+  "cases_compared": 6,
+  "cases": [
+    {
+      "case_id": "case_04",
+      "primary_schema_valid": false,
+      "repeat_schema_valid": true,
+      "common_requirement_ids": [
+        "r1"
+      ],
+      "classification_consistent": true,
+      "candidate_evidence_references_consistent": false
+    },
+    {
+      "case_id": "case_07",
+      "primary_schema_valid": false,
+      "repeat_schema_valid": false,
+      "common_requirement_ids": [
+        "r1"
+      ],
+      "classification_consistent": true,
+      "candidate_evidence_references_consistent": true
+    },
+    {
+      "case_id": "case_10",
+      "primary_schema_valid": true,
+      "repeat_schema_valid": true,
+      "common_requirement_ids": [
+        "r1"
+      ],
+      "classification_consistent": true,
+      "candidate_evidence_references_consistent": true
+    },
+    {
+      "case_id": "case_13",
+      "primary_schema_valid": false,
+      "repeat_schema_valid": false,
+      "common_requirement_ids": [
+        "r1"
+      ],
+      "classification_consistent": true,
+      "candidate_evidence_references_consistent": true
+    },
+    {
+      "case_id": "case_14",
+      "primary_schema_valid": false,
+      "repeat_schema_valid": false,
+      "common_requirement_ids": [
+        "r1"
+      ],
+      "classification_consistent": true,
+      "candidate_evidence_references_consistent": false
+    },
+    {
+      "case_id": "case_18",
+      "primary_schema_valid": false,
+      "repeat_schema_valid": false,
+      "common_requirement_ids": [
+        "r1"
+      ],
+      "classification_consistent": true,
+      "candidate_evidence_references_consistent": false
+    }
+  ],
+  "classification_consistency": {
+    "numerator": 6,
+    "denominator": 6
+  },
+  "candidate_evidence_reference_consistency": {
+    "numerator": 3,
+    "denominator": 6
+  },
+  "primary_schema_validity": {
+    "numerator": 1,
+    "denominator": 6
+  },
+  "repeat_schema_validity": {
+    "numerator": 2,
+    "denominator": 6
+  },
+  "first_repeat_attempt": {
+    "status": "unscorable",
+    "session_id": "01a13585-07f8-7893-ae6f-f9d186f0eff8",
+    "reason": "Output did not conform to the documented assessment schema; the repeat prompt referred to a format unavailable in that clean context."
+  },
+  "interpretation": "Run agreement is consistency evidence only, not correctness or additional ground truth."
+}
