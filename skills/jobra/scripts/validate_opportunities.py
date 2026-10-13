@@ -99,7 +99,7 @@ def validate_opportunities(document):
             for ref in claim["evidence_ids"]:
                 if ref not in evidence:
                     fail(f"claims.{field}: unknown evidence")
-            if field in ("salary", "seniority", "employment_type", "posting_date", "status") and claim["origin"] == "inferred":
+            if field in ("salary", "seniority", "employment_type", "posting_date", "status", "posting_id") and claim["origin"] == "inferred":
                 fail(f"claims.{field}: explicit observation required")
             if field == "posting_date" and claim["value"] is not None:
                 posting = date.fromisoformat(claim["value"])
@@ -117,4 +117,19 @@ def validate_opportunities(document):
                 if any(_time(source["observed_at"]) == last and source["access"] == "inaccessible"
                        for source in sources.values()):
                     fail("latest inaccessible observation requires unknown status")
+        for source in sources.values():
+            result = source.get("observation_result")
+            code = source.get("http_status")
+            if result == "reachable" and (source["access"] != "accessible" or (code is not None and not 200 <= code < 300)):
+                fail("reachable observation has inconsistent access result")
+            if result == "not_found" and (source["access"] != "inaccessible" or code != 404):
+                fail("not-found observation has inconsistent access result")
+            if result == "gone" and (source["access"] != "inaccessible" or code != 410):
+                fail("gone observation has inconsistent access result")
+            if result == "redirected" and (source["access"] != "inaccessible" or code is None or not 300 <= code < 400 or not source.get("redirected_to")):
+                fail("redirect observation has inconsistent access result")
+            if result == "temporary_failure" and (source["access"] != "inaccessible" or code not in (408, 425, 429) and not (code is not None and 500 <= code < 600)):
+                fail("temporary-failure observation has inconsistent access result")
+            if result == "access_restricted" and (source["access"] != "inaccessible" or code not in (401, 403)):
+                fail("restricted observation has inconsistent access result")
     return sorted(set(errors))
