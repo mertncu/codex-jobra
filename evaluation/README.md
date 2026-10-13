@@ -102,3 +102,7 @@ resistance remains unmeasured. The deterministic suite tests the evaluator and
 existing validators, not Codex's semantic extraction quality. Installed skill
 discovery on this host remains unverified until the manual acceptance procedure
 is observed.
+
+For candidate–opportunity matching evaluation, see the separate [synthetic
+benchmark, scoring methodology, and example reports](matching/README.md). It
+does not use the Candidate Intelligence golden labels or private pilot files.

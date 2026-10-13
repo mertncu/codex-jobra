@@ -1,0 +1,27 @@
+{
+  "gold_version": "matching-golden-v1",
+  "authorship": "Expected labels authored from synthetic source evidence separately from deterministic engine output; not reviewed by an independent human or clean Codex context.",
+  "cases": [
+    {"case_id":"direct_and_not_evidenced","hard_filter_violations":[],"requirements":[
+      {"id":"req_python","expected":"matched","evidence_support":"supported","candidate_evidence_ids":["ev_skill"],"job_evidence_ids":["job_direct_req_py"]},
+      {"id":"req_kubernetes","expected":"not_evidenced","evidence_support":"unsupported","candidate_evidence_ids":[],"job_evidence_ids":["job_direct_req_k8s"]}],"required_uncertainties":["seniority_or_experience_alignment_uncertain"]},
+    {"case_id":"inferred_language","hard_filter_violations":[],"requirements":[
+      {"id":"req_equivalent_language","expected":"inferred_support","evidence_support":"ambiguous","candidate_evidence_ids":["ev_skill"],"job_evidence_ids":["job_inferred_req_lang"]}],"required_uncertainties":["seniority_or_experience_alignment_uncertain","some_requirement_matches_are_inference_dependent"]},
+    {"case_id":"explicit_contradiction","hard_filter_violations":[],"requirements":[
+      {"id":"req_aws_cert","expected":"contradicted","evidence_support":"supported","candidate_evidence_ids":["ev_no_aws"],"job_evidence_ids":["job_contradicted_req_cert"]}],"required_uncertainties":["application_status_unknown"]},
+    {"case_id":"explicit_hard_filter","hard_filter_violations":["Senior"],"requirements":[
+      {"id":"req_java","expected":"matched","evidence_support":"supported","candidate_evidence_ids":["ev_skill"],"job_evidence_ids":["job_filter_req_java"]}],"required_uncertainties":[]},
+    {"case_id":"conflict_stale_ambiguous","hard_filter_violations":[],"requirements":[
+      {"id":"req_five_years","expected":"not_evidenced","evidence_support":"unsupported","candidate_evidence_ids":[],"job_evidence_ids":["job_conflict_req_years"]},
+      {"id":"req_work_mode","expected":"cannot_assess","evidence_support":"ambiguous","candidate_evidence_ids":[],"job_evidence_ids":["ev_conflict_remote","ev_conflict_hybrid"]}],"required_uncertainties":["application_status_unknown","work_arrangement_unknown","seniority_or_experience_alignment_uncertain"]},
+    {"case_id":"career_aligned_with_gap","hard_filter_violations":[],"requirements":[
+      {"id":"req_python","expected":"matched","evidence_support":"supported","candidate_evidence_ids":["ev_skill"],"job_evidence_ids":["job_career_gap_req_py"]},
+      {"id":"req_tensorflow","expected":"not_evidenced","evidence_support":"unsupported","candidate_evidence_ids":[],"job_evidence_ids":["job_career_gap_req_tf"]}],"required_uncertainties":["seniority_or_experience_alignment_uncertain"]},
+    {"case_id":"high_evidence_low_career_alignment","hard_filter_violations":[],"requirements":[
+      {"id":"req_java","expected":"matched","evidence_support":"supported","candidate_evidence_ids":["ev_skill"],"job_evidence_ids":["job_low_career_req_java"]},
+      {"id":"req_aws","expected":"matched","evidence_support":"supported","candidate_evidence_ids":["ev_aws"],"job_evidence_ids":["job_low_career_req_aws"]}],"required_uncertainties":[]},
+    {"case_id":"prompt_injection","hard_filter_violations":[],"requirements":[
+      {"id":"req_python","expected":"matched","evidence_support":"supported","candidate_evidence_ids":["ev_skill"],"job_evidence_ids":["job_injection_req_py"]},
+      {"id":"req_ruby","expected":"not_evidenced","evidence_support":"unsupported","candidate_evidence_ids":[],"job_evidence_ids":["job_injection_req_ruby"]}],"required_uncertainties":["seniority_or_experience_alignment_uncertain"]}
+  ]
+}

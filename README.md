@@ -88,6 +88,13 @@ dataset and deterministic scorer. See [the evaluation workflow](evaluation/READM
 and its [example report](evaluation/example-report.md). No Codex extraction
 accuracy is claimed until independently generated predictions are evaluated.
 
+Explainable matching also has a synthetic benchmark and deterministic
+evaluation runner. See [matching evaluation methodology](evaluation/matching/README.md)
+and its [machine-readable](evaluation/matching/example-report.v1.json) and
+[human-readable](evaluation/matching/example-report.v1.md) example reports.
+The included Task 5 semantic run was unblinded within one Codex context and is
+not an independent agent-accuracy result.
+
 The [opportunity data contract](docs/opportunity-data-contract.md) supports
 validation and atomic local snapshots of sourced job listings. The
 [discover workflow](docs/opportunity-discovery.md) uses Codex web tools with
