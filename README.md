@@ -91,4 +91,6 @@ accuracy is claimed until independently generated predictions are evaluated.
 The [opportunity data contract](docs/opportunity-data-contract.md) supports
 validation and atomic local snapshots of sourced job listings. The
 [discover workflow](docs/opportunity-discovery.md) uses Codex web tools with
-approved preferences. Candidate matching remains unimplemented.
+approved preferences. Evidence-grounded matching uses a local interpretation
+packet and creates private, immutable results; see
+[the matching workflow](docs/opportunity-matching.md).

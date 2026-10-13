@@ -45,7 +45,7 @@ def write_private_json(workspace: Path, category: str, filename: str, data: obje
 
 def write_private_json_atomic(workspace: Path, category: str, filename: str, data: object) -> Path:
     """Publish a complete private JSON snapshot without replacing an existing file."""
-    if category not in ("profiles", "evaluations", "opportunities", "discovery") or not filename.endswith(".json") or "/" in filename or ".." in filename:
+    if category not in ("profiles", "evaluations", "opportunities", "discovery", "matches") or not filename.endswith(".json") or "/" in filename or ".." in filename:
         raise StorageError("invalid_destination")
     root = Path(workspace)
     if not root.is_dir():

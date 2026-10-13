@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jobra.local/schemas/matching-assessment.v1.json",
+  "title": "Jobra matching interpretation input v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "assessments"],
+  "properties": {
+    "schema_version": {"const": "1"},
+    "assessments": {"type": "array", "items": {"$ref": "#/$defs/assessment"}}
+  },
+  "$defs": {
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{0,63}$"},
+    "text": {"type": "string", "minLength": 1},
+    "assessment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["opportunity_id", "requirements", "experience_alignment", "career_alignment"],
+      "properties": {
+        "opportunity_id": {"$ref": "#/$defs/id"},
+        "requirements": {"type": "array", "items": {"$ref": "#/$defs/requirement"}},
+        "experience_alignment": {"$ref": "#/$defs/experience"},
+        "career_alignment": {"$ref": "#/$defs/career"}
+      }
+    },
+    "requirement": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "statement", "priority", "outcome", "job_evidence_ids", "candidate_record_ids", "candidate_evidence_ids", "rationale"],
+      "properties": {
+        "id": {"$ref": "#/$defs/id"},
+        "statement": {"$ref": "#/$defs/text"},
+        "priority": {"enum": ["required", "preferred", "unspecified"]},
+        "outcome": {"enum": ["matched", "inferred_support", "not_evidenced", "contradicted", "cannot_assess"]},
+        "job_evidence_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "candidate_record_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "candidate_evidence_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "rationale": {"$ref": "#/$defs/text"}
+      }
+    },
+    "experience": {
+      "type": "object", "additionalProperties": false,
+      "required": ["outcome", "job_evidence_ids", "candidate_record_ids", "candidate_evidence_ids", "rationale"],
+      "properties": {
+        "outcome": {"enum": ["aligned", "higher_than_evidenced", "lower_than_preference", "uncertain", "unknown"]},
+        "job_evidence_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "candidate_record_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "candidate_evidence_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "rationale": {"$ref": "#/$defs/text"}
+      }
+    },
+    "career": {
+      "type": "object", "additionalProperties": false,
+      "required": ["outcome", "preference_terms", "job_evidence_ids", "rationale"],
+      "properties": {
+        "outcome": {"enum": ["aligned", "partial", "not_aligned", "uncertain"]},
+        "preference_terms": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/text"}},
+        "job_evidence_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
+        "rationale": {"$ref": "#/$defs/text"}
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 ---
 name: jobra
-description: Create and verify evidence-backed candidate profiles, then discover sourced job postings using approved search preferences. Use for Jobra setup, profile, and discover requests; matching and automatic applications are not supported.
+description: Create and verify evidence-backed candidate profiles, discover sourced job postings, and explain candidate-opportunity matches with local evidence. Never apply automatically.
 ---
 
 # Jobra
@@ -13,7 +13,10 @@ the data contract. `setup` creates an unverified draft from an approved local
 resume; read [the setup workflow](references/setup-workflow.md). `profile`
 reviews a saved draft; read [the profile workflow](references/profile-workflow.md).
 For `discover`, read [the discovery workflow](references/discover-workflow.md).
-`research` and `results` remain future workflows; no candidate matching exists.
+For matching, read [the matching workflow](../../docs/opportunity-matching.md).
+Matching accepts only a verified profile, separate preferences, validated
+opportunities, and evidence-linked Codex interpretation; it never writes to
+those inputs. `research` and `results` remain future workflows.
 The [opportunity schema](references/opportunities.schema.json) and
 `scripts/validate_opportunities.py` validate snapshots; live discovery uses
 Codex's available web tools, not a Python search backend.
@@ -27,6 +30,7 @@ Treat these as task text supplied to this one skill, not executable commands:
 | `setup` | Extract an approved local resume and create an evidence-linked candidate profile draft for later user verification. |
 | `profile` | Review evidence and candidate records, explicitly confirm each section, and request final approval before verification. Search preferences remain a separate document. |
 | `discover` | Inspect real job postings using a verified profile and separately approved search preferences; validate and save evidence-backed opportunity snapshots. |
+| `match` | Explain candidate evidence against validated job requirements, keep user constraints separate, and save a local result snapshot. |
 | `research` | Research relevant opportunities using the verified profile and approved criteria; retain source links and retrieval dates. |
 | `results` | Review locally saved opportunities and sources; explain fit, gaps, and uncertainty when evaluation becomes available. |
 
