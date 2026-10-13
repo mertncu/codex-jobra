@@ -1,0 +1,341 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jobra.local/schemas/opportunities.v1.json",
+  "title": "Jobra opportunity snapshot v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "opportunities"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "opportunities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/opportunity"
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]{0,63}$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https?://"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "origin",
+        "evidence_ids"
+      ],
+      "properties": {
+        "value": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "origin": {
+          "enum": [
+            "observed",
+            "inferred",
+            "unknown"
+          ]
+        },
+        "evidence_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "origin": {
+                "const": "unknown"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "null"
+              },
+              "evidence_ids": {
+                "maxItems": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "value": {
+                "$ref": "#/$defs/text"
+              },
+              "evidence_ids": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "url",
+        "platform",
+        "observed_at",
+        "access"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "url": {
+          "$ref": "#/$defs/url"
+        },
+        "platform": {
+          "$ref": "#/$defs/text"
+        },
+        "observed_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "access": {
+          "enum": [
+            "accessible",
+            "inaccessible"
+          ]
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source_id",
+        "excerpt"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "source_id": {
+          "$ref": "#/$defs/id"
+        },
+        "excerpt": {
+          "$ref": "#/$defs/text"
+        },
+        "location": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "opportunity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "original_url",
+        "source_platform",
+        "discovered_at",
+        "last_observed_at",
+        "claims",
+        "sources",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "original_url": {
+          "$ref": "#/$defs/url"
+        },
+        "source_platform": {
+          "$ref": "#/$defs/text"
+        },
+        "discovered_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "last_observed_at": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "claims": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "employer",
+            "location",
+            "description",
+            "salary",
+            "seniority",
+            "work_arrangement",
+            "employment_type",
+            "posting_date",
+            "status"
+          ],
+          "properties": {
+            "title": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/claim"
+                }
+              ]
+            },
+            "employer": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/claim"
+                }
+              ]
+            },
+            "location": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/claim"
+                }
+              ]
+            },
+            "description": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/claim"
+                }
+              ]
+            },
+            "salary": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/claim"
+                }
+              ]
+            },
+            "seniority": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/claim"
+                }
+              ]
+            },
+            "work_arrangement": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/claim"
+                },
+                {
+                  "properties": {
+                    "value": {
+                      "enum": [
+                        null,
+                        "remote",
+                        "hybrid",
+                        "onsite"
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            "employment_type": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/claim"
+                },
+                {
+                  "properties": {
+                    "value": {
+                      "enum": [
+                        null,
+                        "full_time",
+                        "part_time",
+                        "contract",
+                        "temporary",
+                        "internship",
+                        "apprenticeship",
+                        "other"
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            "posting_date": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/claim"
+                },
+                {
+                  "properties": {
+                    "value": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "format": "date"
+                    }
+                  }
+                }
+              ]
+            },
+            "status": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/claim"
+                },
+                {
+                  "properties": {
+                    "value": {
+                      "enum": [
+                        null,
+                        "open",
+                        "closed",
+                        "expired"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/source"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        }
+      }
+    }
+  }
+}
