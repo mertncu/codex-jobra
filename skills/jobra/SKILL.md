@@ -24,8 +24,8 @@ repair attempt for audit; it never writes to source inputs. See the matching
 workflow for the exact catalog and repair procedure, and apply its
 [evidence-sufficiency policy](../../docs/matching-evidence-policy.md) to every
 requirement. A matching rationale must explain how evidence supports each
-qualification facet and name unresolved gaps. `research` and `results` remain
-future workflows.
+qualification facet and name unresolved gaps. `research` remains a future
+workflow. For `results`, read [the local results workflow](references/results-workflow.md).
 The [opportunity schema](references/opportunities.schema.json) and
 `scripts/validate_opportunities.py` validate snapshots; live discovery uses
 Codex's available web tools, not a Python search backend.
@@ -41,7 +41,7 @@ Treat these as task text supplied to this one skill, not executable commands:
 | `discover` | Inspect real job postings using a verified profile and separately approved search preferences; validate and save evidence-backed opportunity snapshots. |
 | `match` | Explain candidate evidence against validated job requirements, keep user constraints separate, and save a local result snapshot. |
 | `research` | Research relevant opportunities using the verified profile and approved criteria; retain source links and retrieval dates. |
-| `results` | Review locally saved opportunities and sources; explain fit, gaps, and uncertainty when evaluation becomes available. |
+| `results` | Review saved match results and opportunity sources; explain candidate fit, career alignment, gaps, freshness, and uncertainty. |
 
 If intent is unclear, ask which workflow the user means, without collecting a CV.
 
