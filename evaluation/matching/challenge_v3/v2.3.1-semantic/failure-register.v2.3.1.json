@@ -1,0 +1,146 @@
+{
+  "register_version": "matching-failure-register-v2.3.1",
+  "cases": [
+    {
+      "case_id": "case_16",
+      "severity": "medium",
+      "category": [
+        "schema_or_invariant_failure:candidate_evidence_not_linked_to_record"
+      ],
+      "expected_requirement_outcomes": {},
+      "actual_requirement_outcomes": {},
+      "missing_uncertainties": [],
+      "root_cause_hypothesis": "Review the source excerpts and required rationale points; this automated register does not adjudicate whether a golden label is debatable.",
+      "review_status": "requires_human_review",
+      "recommended_fix": "Review the exact source-reference constraint, then add a focused validation regression without changing frozen benchmark labels.",
+      "regression_test_proposal": "Add a synthetic unit case that reproduces this validation failure and confirms the intended uncertainty-preserving behavior."
+    },
+    {
+      "case_id": "case_12",
+      "severity": "medium",
+      "category": [
+        "unmatched_extra_requirement_slot"
+      ],
+      "expected_requirement_outcomes": {
+        "r1": "cannot_assess"
+      },
+      "actual_requirement_outcomes": {
+        "r1": "cannot_assess",
+        "r2": "cannot_assess"
+      },
+      "missing_uncertainties": [],
+      "root_cause_hypothesis": "The assessment split a single contradictory employer requirement into two slots; the extra slot has no corresponding frozen source requirement. The classification remains uncertain, but one-to-one slot discipline failed.",
+      "review_status": "requires_human_review",
+      "recommended_fix": "Review the exact source-reference constraint, then add a focused validation regression without changing frozen benchmark labels.",
+      "regression_test_proposal": "Add a synthetic unit case that reproduces this validation failure and confirms the intended uncertainty-preserving behavior."
+    },
+    {
+      "case_id": "case_02",
+      "severity": "high",
+      "category": [
+        "positive_analogy_exceeds_qualification_scope"
+      ],
+      "expected_requirement_outcomes": {
+        "r1": "not_evidenced"
+      },
+      "actual_requirement_outcomes": {
+        "r1": "inferred_support"
+      },
+      "missing_uncertainties": [],
+      "root_cause_hypothesis": "The rationale recognizes coursework only and explicitly says professional microservice architecture ownership is not established, but still emits inferred_support. The golden judgment may be debatable under the broad analogy definition; human adjudication is needed.",
+      "recommended_fix": "Require a concrete capability relation beyond shared framework mention before inferred_support; retain explicit gaps in the rationale.",
+      "regression_test_proposal": "Regression case: Spring Boot coursework versus required production microservice architecture ownership.",
+      "review_status": "requires_human_review_of_source_first_label"
+    },
+    {
+      "case_id": "case_03",
+      "severity": "high",
+      "category": [
+        "academic_skill_used_for_professional_threshold"
+      ],
+      "expected_requirement_outcomes": {
+        "r1": "not_evidenced"
+      },
+      "actual_requirement_outcomes": {
+        "r1": "inferred_support"
+      },
+      "missing_uncertainties": [],
+      "root_cause_hypothesis": "Academic TensorFlow use was treated as positive support for professional experience/duration despite the rationale acknowledging neither is established.",
+      "recommended_fix": "Separate technology exposure from professional context and duration; an academic project alone should remain not_evidenced for a professional-years requirement.",
+      "regression_test_proposal": "Regression case: TensorFlow capstone versus professional experience threshold.",
+      "review_status": "requires_human_review_of_source_first_label"
+    },
+    {
+      "case_id": "case_05",
+      "severity": "high",
+      "category": [
+        "tool_invocation_used_as_agent_architecture_analogy"
+      ],
+      "expected_requirement_outcomes": {
+        "r1": "not_evidenced"
+      },
+      "actual_requirement_outcomes": {
+        "r1": "inferred_support"
+      },
+      "missing_uncertainties": [],
+      "root_cause_hypothesis": "One LLM function call was treated as partial support for agent architecture even though planning, orchestration, persistence, and production ownership were undocumented.",
+      "recommended_fix": "Treat a single call as evidence of tool invocation only; require architecture-specific evidence for agent-system support.",
+      "regression_test_proposal": "Regression case: one LLM function call versus agent architecture.",
+      "review_status": "requires_human_review_of_source_first_label"
+    },
+    {
+      "case_id": "case_06",
+      "severity": "high",
+      "category": [
+        "library_usage_used_as_rag_system_design_analogy"
+      ],
+      "expected_requirement_outcomes": {
+        "r1": "not_evidenced"
+      },
+      "actual_requirement_outcomes": {
+        "r1": "inferred_support"
+      },
+      "missing_uncertainties": [],
+      "root_cause_hypothesis": "Using a supplied RAG library was elevated to inferred support for RAG system design, while the rationale lists design and production gaps.",
+      "recommended_fix": "Require a distinct design/operation activity before giving positive support to system-design requirements.",
+      "regression_test_proposal": "Regression case: supplied RAG package integration versus designing and operating a RAG system.",
+      "review_status": "requires_human_review_of_source_first_label"
+    },
+    {
+      "case_id": "case_08",
+      "severity": "high",
+      "category": [
+        "api_consumption_used_as_api_implementation_analogy"
+      ],
+      "expected_requirement_outcomes": {
+        "r1": "not_evidenced"
+      },
+      "actual_requirement_outcomes": {
+        "r1": "inferred_support"
+      },
+      "missing_uncertainties": [],
+      "root_cause_hypothesis": "Client SDK consumption was treated as positive support for REST API design and implementation although those activities are absent.",
+      "recommended_fix": "Do not infer API implementation from API consumption without evidence of server-side design or endpoint development.",
+      "regression_test_proposal": "Regression case: third-party API client use versus API development.",
+      "review_status": "requires_human_review_of_source_first_label"
+    },
+    {
+      "case_id": "case_10",
+      "severity": "medium",
+      "category": [
+        "direct_evidence_downgraded_to_inference"
+      ],
+      "expected_requirement_outcomes": {
+        "r1": "matched"
+      },
+      "actual_requirement_outcomes": {
+        "r1": "inferred_support"
+      },
+      "missing_uncertainties": [],
+      "root_cause_hypothesis": "The candidate evidence explicitly describes designing and operating a production RAG service, including retrieval evaluation; the assessment still labels it analogy-dependent without naming a material unresolved gap.",
+      "recommended_fix": "Require the agent to distinguish a real remaining gap from generic caution; classify direct full-scope evidence as matched.",
+      "regression_test_proposal": "Regression case: complete production RAG lifecycle evidence should remain a direct match.",
+      "review_status": "requires_human_review_of_source_first_label"
+    }
+  ]
+}

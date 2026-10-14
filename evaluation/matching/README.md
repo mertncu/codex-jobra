@@ -1,5 +1,18 @@
 # Matching evaluation
 
+The latest blind semantic challenge is documented in
+[`challenge_v3/v2.3.1-semantic/README.md`](challenge_v3/v2.3.1-semantic/README.md).
+The first V2.3 freeze is retained as an aborted audit record in
+[`challenge_v3/v2.3-semantic/ABORTED.md`](challenge_v3/v2.3-semantic/ABORTED.md):
+its reference catalog exposed metadata as requirement slots, so no scores were
+produced. V2.3.1 fixes that catalog defect and uses new hashes and clean
+projectless prediction sessions. The source-first golden labels have not
+received independent human adjudication.
+The review packet for V2.2 `case_07`, `case_11`, and six ambiguous support
+judgments remains pending at
+[`human-review-packet.v2.3.md`](challenge_v3/v2.3-semantic/human-review-packet.v2.3.md).
+The V2.3.1 report and failure register record the new blind run.
+
 `benchmark.v1.json` contains synthetic, versioned candidate profiles, explicit
 search preferences, opportunity snapshots, and source evidence. The separately
 authored `golden.v1.json` records expected requirement classifications,
@@ -90,12 +103,12 @@ benchmark runner.
 
 ## Observations and next improvements
 
-The current synthetic run had no classification, reference, hard-filter,
-uncertainty-warning, or deterministic aggregation failures. That result is
-weak evidence because the run was unblinded, the benchmark is small, and its
-labels were not independently adjudicated. The useful next steps are to repeat
-the predictions in a fresh Codex context that cannot access the golden file,
-have a human review the golden labels and evidence-support judgments, and add
-more cases with long postings, multiple equivalent-but-not-identical evidence
-references, and conflicts between candidate evidence records. These improve
-measurement coverage rather than tuning a single aggregate score.
+V2.3.1 reached 7/13 exact classifications on non-ambiguous requirements,
+5/13 adjudicated evidence-support judgments, and 4/9 precision for positive
+support claims. Five unsupported positive inferences drove most semantic
+errors. Hard-filter execution and correctness were 18/18. One of 18 assessments
+failed aggregation because a cited candidate evidence item was not linked to a
+record, and one case emitted an extra requirement slot. The run was blinded at
+prediction time, but the small source-first label set and rationales still need
+human adjudication. See its report and failure register before using these
+figures to guide further changes.

@@ -1,0 +1,674 @@
+{
+  "packet_version": "jobra-human-adjudication-v2.3",
+  "source_dataset": "matching-challenge-v2",
+  "source_predictions": "56db833e6e53451d967e41f644d99faa",
+  "golden_labels_modified": false,
+  "independent_human_review_performed": false,
+  "reviewer_instructions": "Inspect the synthetic source excerpts and job requirement. Choose a decision and evidence-support label, then fill reviewer_rationale. Do not resolve uncertainty in Jobra's favor by default.",
+  "items": [
+    {
+      "review_item_id": "case_04_r1",
+      "case_id": "case_04",
+      "candidate_source_documents": [
+        {
+          "id": "cand_change_resume",
+          "kind": "resume",
+          "label": "Synthetic benchmark resume"
+        }
+      ],
+      "candidate_evidence": [
+        {
+          "excerpt": "Java",
+          "extraction": "explicit",
+          "id": "ev_skill",
+          "location": "Skills",
+          "review_status": "confirmed",
+          "source_document_id": "cand_change_resume"
+        }
+      ],
+      "opportunity": {
+        "id": "opp_04",
+        "title": "Kotlin Developer",
+        "original_url": "https://jobs.synthetic.example/opp_04",
+        "requirement_evidence": [
+          {
+            "excerpt": "Kotlin production experience is required.",
+            "id": "job_04_evidence_01",
+            "location": "Requirements 1",
+            "source_id": "src_opp_04"
+          }
+        ]
+      },
+      "agent_prediction": {
+        "id": "r1",
+        "statement": "Kotlin production experience is required.",
+        "priority": "required",
+        "outcome": "not_evidenced",
+        "evidence_quality": "insufficient",
+        "candidate_record_ids": [],
+        "candidate_evidence_ids": [],
+        "job_evidence_ids": [
+          "job_04_evidence_01"
+        ],
+        "rationale": "The supplied evidence does not establish Kotlin production experience."
+      },
+      "agent_experience_alignment": {
+        "outcome": "higher_than_evidenced",
+        "job_evidence_ids": [
+          "job_04_evidence_01",
+          "job_opp_04_seniority"
+        ],
+        "candidate_record_ids": [
+          "proj_1",
+          "exp_1"
+        ],
+        "candidate_evidence_ids": [
+          "ev_project",
+          "ev_intern"
+        ],
+        "rationale": "Despite the junior designation, the role requires Kotlin production experience; the evidenced background consists of a Java learning application and customer support work."
+      },
+      "frozen_golden_expectation": {
+        "id": "r1",
+        "expected": "inferred_support",
+        "evidence_support": "ambiguous",
+        "candidate_evidence_ids": [
+          "ev_skill"
+        ],
+        "job_evidence_ids": [
+          "job_04_evidence_01"
+        ]
+      },
+      "frozen_required_uncertainties": [],
+      "disagreement_or_review_question": "The frozen support label is ambiguous. Review whether the cited candidate evidence semantically supports the exact qualification and whether the existing classification expresses that relationship.",
+      "available_reviewer_decisions": {
+        "classification": [
+          "matched",
+          "inferred_support",
+          "not_evidenced",
+          "contradicted",
+          "cannot_assess"
+        ],
+        "evidence_support": [
+          "supported",
+          "unsupported",
+          "ambiguous"
+        ]
+      },
+      "reviewer_decision": null,
+      "reviewer_evidence_support": null,
+      "reviewer_rationale": null,
+      "reviewer_id": null,
+      "reviewed_at": null,
+      "review_status": "pending"
+    },
+    {
+      "review_item_id": "case_06_r1",
+      "case_id": "case_06",
+      "candidate_source_documents": [
+        {
+          "id": "cand_change_resume",
+          "kind": "resume",
+          "label": "Synthetic benchmark resume"
+        }
+      ],
+      "candidate_evidence": [],
+      "opportunity": {
+        "id": "opp_06",
+        "title": "Customer Support Analyst",
+        "original_url": "https://jobs.synthetic.example/opp_06",
+        "requirement_evidence": [
+          {
+            "excerpt": "At least two years of customer support experience is required.",
+            "id": "job_06_evidence_01",
+            "location": "Requirements 1",
+            "source_id": "src_opp_06"
+          }
+        ]
+      },
+      "agent_prediction": {
+        "id": "r1",
+        "statement": "At least two years of customer support experience is required.",
+        "priority": "required",
+        "outcome": "not_evidenced",
+        "evidence_quality": "insufficient",
+        "candidate_record_ids": [],
+        "candidate_evidence_ids": [],
+        "job_evidence_ids": [
+          "job_06_evidence_01"
+        ],
+        "rationale": "Customer support work is documented, but no dates or duration establish the required two years."
+      },
+      "agent_experience_alignment": {
+        "outcome": "uncertain",
+        "job_evidence_ids": [
+          "job_06_evidence_01",
+          "job_opp_06_seniority"
+        ],
+        "candidate_record_ids": [
+          "exp_1"
+        ],
+        "candidate_evidence_ids": [
+          "ev_intern"
+        ],
+        "rationale": "The customer support role is relevant, but its unspecified duration and scope prevent establishing alignment with the two-year requirement and mid-level designation."
+      },
+      "frozen_golden_expectation": {
+        "id": "r1",
+        "expected": "cannot_assess",
+        "evidence_support": "ambiguous",
+        "candidate_evidence_ids": [],
+        "job_evidence_ids": [
+          "job_06_evidence_01"
+        ]
+      },
+      "frozen_required_uncertainties": [
+        "seniority_or_experience_alignment_uncertain"
+      ],
+      "disagreement_or_review_question": "The frozen support label is ambiguous. Review whether the cited candidate evidence semantically supports the exact qualification and whether the existing classification expresses that relationship.",
+      "available_reviewer_decisions": {
+        "classification": [
+          "matched",
+          "inferred_support",
+          "not_evidenced",
+          "contradicted",
+          "cannot_assess"
+        ],
+        "evidence_support": [
+          "supported",
+          "unsupported",
+          "ambiguous"
+        ]
+      },
+      "reviewer_decision": null,
+      "reviewer_evidence_support": null,
+      "reviewer_rationale": null,
+      "reviewer_id": null,
+      "reviewed_at": null,
+      "review_status": "pending"
+    },
+    {
+      "review_item_id": "case_07_r1",
+      "case_id": "case_07",
+      "candidate_source_documents": [
+        {
+          "id": "cand_grad_resume",
+          "kind": "resume",
+          "label": "Synthetic benchmark resume"
+        }
+      ],
+      "candidate_evidence": [
+        {
+          "excerpt": "Built a sample task tracker with Python",
+          "extraction": "explicit",
+          "id": "ev_project",
+          "location": "Projects",
+          "review_status": "confirmed",
+          "source_document_id": "cand_grad_resume"
+        },
+        {
+          "excerpt": "Python",
+          "extraction": "explicit",
+          "id": "ev_skill",
+          "location": "Skills",
+          "review_status": "confirmed",
+          "source_document_id": "cand_grad_resume"
+        }
+      ],
+      "opportunity": {
+        "id": "opp_07",
+        "title": "Sales Engineer",
+        "original_url": "https://jobs.synthetic.example/opp_07",
+        "requirement_evidence": [
+          {
+            "excerpt": "Python product demonstrations are required.",
+            "id": "job_07_evidence_01",
+            "location": "Requirements 1",
+            "source_id": "src_opp_07"
+          }
+        ]
+      },
+      "agent_prediction": {
+        "id": "r1",
+        "statement": "Python product demonstrations are required.",
+        "priority": "required",
+        "outcome": "inferred_support",
+        "evidence_quality": "analogous_uncertain",
+        "candidate_record_ids": [
+          "proj_1"
+        ],
+        "candidate_evidence_ids": [
+          "ev_project"
+        ],
+        "job_evidence_ids": [
+          "job_07_evidence_01"
+        ],
+        "rationale": "Building a sample Python task tracker provides analogous technical experience, but does not establish experience delivering product demonstrations."
+      },
+      "agent_experience_alignment": {
+        "outcome": "aligned",
+        "job_evidence_ids": [
+          "job_opp_07_seniority"
+        ],
+        "candidate_record_ids": [
+          "exp_1"
+        ],
+        "candidate_evidence_ids": [
+          "ev_intern"
+        ],
+        "rationale": "The software internship is consistent with the stated junior level; it does not establish sales engineering experience."
+      },
+      "frozen_golden_expectation": {
+        "id": "r1",
+        "expected": "matched",
+        "evidence_support": "supported",
+        "candidate_evidence_ids": [
+          "ev_skill"
+        ],
+        "job_evidence_ids": [
+          "job_07_evidence_01"
+        ]
+      },
+      "frozen_required_uncertainties": [],
+      "disagreement_or_review_question": "The candidate has explicit Python skill and a Python project, but no evidence of giving product demonstrations. Decide whether the whole compound requirement is directly matched, only analogously supported, or undocumented in its product-demonstration facet.",
+      "available_reviewer_decisions": {
+        "classification": [
+          "matched",
+          "inferred_support",
+          "not_evidenced",
+          "contradicted",
+          "cannot_assess"
+        ],
+        "evidence_support": [
+          "supported",
+          "unsupported",
+          "ambiguous"
+        ]
+      },
+      "reviewer_decision": null,
+      "reviewer_evidence_support": null,
+      "reviewer_rationale": null,
+      "reviewer_id": null,
+      "reviewed_at": null,
+      "review_status": "pending"
+    },
+    {
+      "review_item_id": "case_09_r1",
+      "case_id": "case_09",
+      "candidate_source_documents": [
+        {
+          "id": "cand_senior_resume",
+          "kind": "resume",
+          "label": "Synthetic benchmark resume"
+        }
+      ],
+      "candidate_evidence": [
+        {
+          "excerpt": "Software Engineer at Example Systems, 2020-2025",
+          "extraction": "explicit",
+          "id": "ev_intern",
+          "location": "Experience",
+          "review_status": "confirmed",
+          "source_document_id": "cand_senior_resume"
+        }
+      ],
+      "opportunity": {
+        "id": "opp_09",
+        "title": "Experience Requirements Conflict",
+        "original_url": "https://jobs.synthetic.example/opp_09",
+        "requirement_evidence": [
+          {
+            "excerpt": "Five years of experience are required.",
+            "id": "job_09_evidence_01",
+            "location": "Requirements 1",
+            "source_id": "src_opp_09"
+          },
+          {
+            "excerpt": "No previous experience is needed; new graduates are welcome.",
+            "id": "job_09_evidence_02",
+            "location": "Requirements 2",
+            "source_id": "src_opp_09"
+          }
+        ]
+      },
+      "agent_prediction": {
+        "id": "r1",
+        "statement": "Five years of experience are required.",
+        "priority": "required",
+        "outcome": "cannot_assess",
+        "evidence_quality": "conflicting",
+        "candidate_record_ids": [
+          "exp_1"
+        ],
+        "candidate_evidence_ids": [
+          "ev_intern"
+        ],
+        "job_evidence_ids": [
+          "job_09_evidence_01",
+          "job_09_evidence_02"
+        ],
+        "rationale": "The candidate has software engineering work dated 2020–2025, but the posting contradicts its five-year requirement by stating that no previous experience is needed."
+      },
+      "agent_experience_alignment": {
+        "outcome": "uncertain",
+        "job_evidence_ids": [
+          "job_09_evidence_01",
+          "job_09_evidence_02"
+        ],
+        "candidate_record_ids": [
+          "exp_1"
+        ],
+        "candidate_evidence_ids": [
+          "ev_intern"
+        ],
+        "rationale": "Software engineering work dated 2020–2025 is documented, but the conflicting employer statements prevent a reliable assessment of the intended experience level."
+      },
+      "frozen_golden_expectation": {
+        "id": "r1",
+        "expected": "cannot_assess",
+        "evidence_support": "ambiguous",
+        "candidate_evidence_ids": [],
+        "job_evidence_ids": [
+          "job_09_evidence_01",
+          "job_09_evidence_02"
+        ]
+      },
+      "frozen_required_uncertainties": [
+        "seniority_or_experience_alignment_uncertain"
+      ],
+      "disagreement_or_review_question": "The frozen support label is ambiguous. Review whether the cited candidate evidence semantically supports the exact qualification and whether the existing classification expresses that relationship.",
+      "available_reviewer_decisions": {
+        "classification": [
+          "matched",
+          "inferred_support",
+          "not_evidenced",
+          "contradicted",
+          "cannot_assess"
+        ],
+        "evidence_support": [
+          "supported",
+          "unsupported",
+          "ambiguous"
+        ]
+      },
+      "reviewer_decision": null,
+      "reviewer_evidence_support": null,
+      "reviewer_rationale": null,
+      "reviewer_id": null,
+      "reviewed_at": null,
+      "review_status": "pending"
+    },
+    {
+      "review_item_id": "case_11_r1",
+      "case_id": "case_11",
+      "candidate_source_documents": [
+        {
+          "id": "cand_senior_resume",
+          "kind": "resume",
+          "label": "Synthetic benchmark resume"
+        }
+      ],
+      "candidate_evidence": [
+        {
+          "excerpt": "AWS",
+          "extraction": "explicit",
+          "id": "ev_aws",
+          "location": "Skills",
+          "review_status": "confirmed",
+          "source_document_id": "cand_senior_resume"
+        }
+      ],
+      "opportunity": {
+        "id": "opp_11",
+        "title": "Cloud Solutions Engineer",
+        "original_url": "https://jobs.synthetic.example/opp_11",
+        "requirement_evidence": [
+          {
+            "excerpt": "Commercial experience operating cloud platforms is expected.",
+            "id": "job_11_evidence_01",
+            "location": "Requirements 1",
+            "source_id": "src_opp_11"
+          }
+        ]
+      },
+      "agent_prediction": {
+        "id": "r1",
+        "statement": "Commercial experience operating cloud platforms is expected.",
+        "priority": "required",
+        "outcome": "not_evidenced",
+        "evidence_quality": "insufficient",
+        "candidate_record_ids": [],
+        "candidate_evidence_ids": [],
+        "job_evidence_ids": [
+          "job_11_evidence_01"
+        ],
+        "rationale": "Listing AWS and holding a software engineering role do not establish commercial experience operating cloud platforms."
+      },
+      "agent_experience_alignment": {
+        "outcome": "aligned",
+        "job_evidence_ids": [
+          "job_opp_11_seniority"
+        ],
+        "candidate_record_ids": [
+          "exp_1"
+        ],
+        "candidate_evidence_ids": [
+          "ev_intern"
+        ],
+        "rationale": "Software engineering employment from 2020–2025 supports the stated mid-level seniority; cloud operations experience remains separately unevidenced."
+      },
+      "frozen_golden_expectation": {
+        "id": "r1",
+        "expected": "cannot_assess",
+        "evidence_support": "ambiguous",
+        "candidate_evidence_ids": [
+          "ev_aws"
+        ],
+        "job_evidence_ids": [
+          "job_11_evidence_01"
+        ]
+      },
+      "frozen_required_uncertainties": [
+        "seniority_or_experience_alignment_uncertain"
+      ],
+      "disagreement_or_review_question": "AWS is listed and software employment is dated, but no cloud-operation duties are documented. Decide whether this is not_evidenced or cannot_assess; separately review the missing seniority/experience uncertainty warning.",
+      "available_reviewer_decisions": {
+        "classification": [
+          "matched",
+          "inferred_support",
+          "not_evidenced",
+          "contradicted",
+          "cannot_assess"
+        ],
+        "evidence_support": [
+          "supported",
+          "unsupported",
+          "ambiguous"
+        ]
+      },
+      "reviewer_decision": null,
+      "reviewer_evidence_support": null,
+      "reviewer_rationale": null,
+      "reviewer_id": null,
+      "reviewed_at": null,
+      "review_status": "pending"
+    },
+    {
+      "review_item_id": "case_13_r1",
+      "case_id": "case_13",
+      "candidate_source_documents": [
+        {
+          "id": "cand_change_resume",
+          "kind": "resume",
+          "label": "Synthetic benchmark resume"
+        }
+      ],
+      "candidate_evidence": [],
+      "opportunity": {
+        "id": "opp_13",
+        "title": "Ruby Engineer",
+        "original_url": "https://jobs.synthetic.example/opp_13",
+        "requirement_evidence": [
+          {
+            "excerpt": "Ruby is not required; experience in any language is acceptable.",
+            "id": "job_13_conflict",
+            "location": "Required qualifications",
+            "source_id": "src_opp_13_revised"
+          },
+          {
+            "excerpt": "Ruby experience is required.",
+            "id": "job_13_evidence_01",
+            "location": "Requirements 1",
+            "source_id": "src_opp_13"
+          }
+        ]
+      },
+      "agent_prediction": {
+        "id": "r1",
+        "statement": "Ruby experience is required.",
+        "priority": "required",
+        "outcome": "cannot_assess",
+        "evidence_quality": "conflicting",
+        "candidate_record_ids": [],
+        "candidate_evidence_ids": [],
+        "job_evidence_ids": [
+          "job_13_evidence_01",
+          "job_13_conflict"
+        ],
+        "rationale": "The posting sources disagree on whether Ruby is required or experience in any language suffices; neither source is established as authoritative."
+      },
+      "agent_experience_alignment": {
+        "outcome": "higher_than_evidenced",
+        "job_evidence_ids": [
+          "job_opp_13_seniority"
+        ],
+        "candidate_record_ids": [
+          "exp_1",
+          "proj_1"
+        ],
+        "candidate_evidence_ids": [
+          "ev_intern",
+          "ev_project"
+        ],
+        "rationale": "The Mid designation exceeds the demonstrated software experience: a small Java learning project and customer support work do not establish mid-level engineering experience."
+      },
+      "frozen_golden_expectation": {
+        "id": "r1",
+        "expected": "cannot_assess",
+        "evidence_support": "ambiguous",
+        "candidate_evidence_ids": [],
+        "job_evidence_ids": [
+          "job_13_evidence_01",
+          "job_13_conflict"
+        ]
+      },
+      "frozen_required_uncertainties": [],
+      "disagreement_or_review_question": "The frozen support label is ambiguous. Review whether the cited candidate evidence semantically supports the exact qualification and whether the existing classification expresses that relationship.",
+      "available_reviewer_decisions": {
+        "classification": [
+          "matched",
+          "inferred_support",
+          "not_evidenced",
+          "contradicted",
+          "cannot_assess"
+        ],
+        "evidence_support": [
+          "supported",
+          "unsupported",
+          "ambiguous"
+        ]
+      },
+      "reviewer_decision": null,
+      "reviewer_evidence_support": null,
+      "reviewer_rationale": null,
+      "reviewer_id": null,
+      "reviewed_at": null,
+      "review_status": "pending"
+    },
+    {
+      "review_item_id": "case_18_r1",
+      "case_id": "case_18",
+      "candidate_source_documents": [
+        {
+          "id": "cand_grad_resume",
+          "kind": "resume",
+          "label": "Synthetic benchmark resume"
+        }
+      ],
+      "candidate_evidence": [],
+      "opportunity": {
+        "id": "opp_18",
+        "title": "Software Engineer",
+        "original_url": "https://jobs.synthetic.example/opp_18",
+        "requirement_evidence": [
+          {
+            "excerpt": "At least one year of professional software experience is required.",
+            "id": "job_18_evidence_01",
+            "location": "Requirements 1",
+            "source_id": "src_opp_18"
+          }
+        ]
+      },
+      "agent_prediction": {
+        "id": "r1",
+        "statement": "At least one year of professional software experience is required.",
+        "priority": "required",
+        "outcome": "not_evidenced",
+        "evidence_quality": "insufficient",
+        "candidate_record_ids": [],
+        "candidate_evidence_ids": [],
+        "job_evidence_ids": [
+          "job_18_evidence_01"
+        ],
+        "rationale": "The software internship has no evidenced duration, and the demo project does not establish one year of professional software experience."
+      },
+      "agent_experience_alignment": {
+        "outcome": "uncertain",
+        "job_evidence_ids": [
+          "job_18_evidence_01",
+          "job_opp_18_seniority"
+        ],
+        "candidate_record_ids": [
+          "exp_1"
+        ],
+        "candidate_evidence_ids": [
+          "ev_intern"
+        ],
+        "rationale": "The internship is relevant to the entry-level role, but its unspecified duration leaves the one-year professional experience threshold unresolved."
+      },
+      "frozen_golden_expectation": {
+        "id": "r1",
+        "expected": "cannot_assess",
+        "evidence_support": "ambiguous",
+        "candidate_evidence_ids": [],
+        "job_evidence_ids": [
+          "job_18_evidence_01"
+        ]
+      },
+      "frozen_required_uncertainties": [
+        "seniority_or_experience_alignment_uncertain"
+      ],
+      "disagreement_or_review_question": "The frozen support label is ambiguous. Review whether the cited candidate evidence semantically supports the exact qualification and whether the existing classification expresses that relationship.",
+      "available_reviewer_decisions": {
+        "classification": [
+          "matched",
+          "inferred_support",
+          "not_evidenced",
+          "contradicted",
+          "cannot_assess"
+        ],
+        "evidence_support": [
+          "supported",
+          "unsupported",
+          "ambiguous"
+        ]
+      },
+      "reviewer_decision": null,
+      "reviewer_evidence_support": null,
+      "reviewer_rationale": null,
+      "reviewer_id": null,
+      "reviewed_at": null,
+      "review_status": "pending"
+    }
+  ]
+}

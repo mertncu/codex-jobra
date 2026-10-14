@@ -1,0 +1,22 @@
+{
+  "freeze_version": "matching-semantic-freeze-v2.3",
+  "benchmark_version": "matching-challenge-v2.3-semantic",
+  "gold_version": "matching-challenge-golden-v2.3-semantic",
+  "prediction_run_id": "adf8c71d45b843b98f0b5c82d596e62c",
+  "frozen_at_utc": "2026-10-14T16:25:32+00:00",
+  "case_count": 18,
+  "input_sha256": "eb96f89301e0d0b3643fae92e2bcf129bfd851e49964e61b678fcfada2a6cb54",
+  "golden_sha256": "a821364a93651f2c366a9067311ee7165bc10cba1644e63287efb3b3b128af75",
+  "package_sha256": "be821d785609674e6f58d7200214379908f590cd91da814fda92c40910c7e176",
+  "implementation_sha256": {
+    "build_inputs.py": "a3678db22682686026d00fd29a087d8e9ad00789fc2836c61646032f2cfe31be",
+    "build_prediction_package.py": "f4b8b887208ac642940a09cfbcded61549838424f23ed2ec857f328132a8422b",
+    "freeze.py": "dcbb06faaf59cf89b3b99cf6c8edd0374d8ba8739837bda1d87659f3ca765da4",
+    "score_v2.3.py": "f30bb3f269d8912e4c09c691ffac21df3a8ff886e8f064bf02d244863ef1ef99",
+    "evaluate_matching.py": "76828a346f318f2f21202b8ecb2aa7d89ae2f48b1a48827891e1e624e49ce0c5",
+    "match_opportunities.py": "f3e656759eef39e3de0674628b20a6d2d9195d9122d0d7b68ecca70a20408cce",
+    "matching-assessment.schema.json": "980c6e19bd1b542b271b722e26ffc34ef637d283825d59568aa2b0ebdeac63ef",
+    "opportunity-matching.md": "d03abab2006ed286ed82d5c2cab952b0f9e938b14d47832560a50302df7dd576",
+    "matching-evidence-policy.md": "518d837d00de8209b4a4c46498fe4776395ed79e92c3c72a2da5004d583cfe66"
+  }
+}

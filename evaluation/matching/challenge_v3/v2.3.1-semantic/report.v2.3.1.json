@@ -1,0 +1,642 @@
+{
+  "report_version": "matching-semantic-evaluation-v2.3.1",
+  "dataset_version": "matching-challenge-v2.3.1-semantic",
+  "gold_version": "matching-challenge-golden-v2.3.1-semantic",
+  "evaluation_date": "2026-10-14",
+  "case_count": 18,
+  "prediction_attempts": 18,
+  "missing_prediction_cases": [],
+  "unmatched_prediction_requirement_count": 1,
+  "unmatched_positive_prediction_count_unadjudicated": 0,
+  "ambiguous_requirement_count_excluded_from_accuracy": 5,
+  "evaluation_context": {
+    "status": "separate_clean_projectless_codex_tasks",
+    "prediction_session_ids": [
+      "01a13b47-13df-7c82-8801-bdd283564f17",
+      "01a13b47-1c1c-7f60-84ac-8edb48088c8e",
+      "01a13b47-209b-7050-8a2f-e36c0c99ae3f",
+      "01a13b47-23bb-78f2-a2f2-1dae28bea9b4",
+      "01a13b47-26ea-73c1-81b0-d8e6637698e7",
+      "01a13b47-29eb-7a70-815c-fa042b35ed45"
+    ],
+    "note": "Each prediction task received only its assigned synthetic source inputs, catalog, schema, and policy. No task received golden labels, prior predictions, or evaluation reports."
+  },
+  "metrics": {
+    "requirement_classification_accuracy": {
+      "numerator": 7,
+      "denominator": 13,
+      "rate": 0.5384615384615384
+    },
+    "supported_match_precision": {
+      "numerator": 4,
+      "denominator": 9,
+      "rate": 0.4444444444444444
+    },
+    "supported_match_recall": {
+      "numerator": 4,
+      "denominator": 4,
+      "rate": 1.0
+    },
+    "confusion_matrix": {
+      "matched": {
+        "matched": 3,
+        "inferred_support": 1,
+        "not_evidenced": 0,
+        "contradicted": 0,
+        "cannot_assess": 0,
+        "missing_prediction": 0
+      },
+      "inferred_support": {
+        "matched": 0,
+        "inferred_support": 0,
+        "not_evidenced": 0,
+        "contradicted": 0,
+        "cannot_assess": 0,
+        "missing_prediction": 0
+      },
+      "not_evidenced": {
+        "matched": 0,
+        "inferred_support": 5,
+        "not_evidenced": 3,
+        "contradicted": 0,
+        "cannot_assess": 0,
+        "missing_prediction": 0
+      },
+      "contradicted": {
+        "matched": 0,
+        "inferred_support": 0,
+        "not_evidenced": 0,
+        "contradicted": 1,
+        "cannot_assess": 0,
+        "missing_prediction": 0
+      },
+      "cannot_assess": {
+        "matched": 0,
+        "inferred_support": 0,
+        "not_evidenced": 0,
+        "contradicted": 0,
+        "cannot_assess": 0,
+        "missing_prediction": 0
+      }
+    },
+    "per_class_precision_recall": {
+      "matched": {
+        "precision": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        },
+        "recall": {
+          "numerator": 3,
+          "denominator": 4,
+          "rate": 0.75
+        }
+      },
+      "inferred_support": {
+        "precision": {
+          "numerator": 0,
+          "denominator": 6,
+          "rate": 0.0
+        },
+        "recall": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        }
+      },
+      "not_evidenced": {
+        "precision": {
+          "numerator": 3,
+          "denominator": 3,
+          "rate": 1.0
+        },
+        "recall": {
+          "numerator": 3,
+          "denominator": 8,
+          "rate": 0.375
+        }
+      },
+      "contradicted": {
+        "precision": {
+          "numerator": 1,
+          "denominator": 1,
+          "rate": 1.0
+        },
+        "recall": {
+          "numerator": 1,
+          "denominator": 1,
+          "rate": 1.0
+        }
+      },
+      "cannot_assess": {
+        "precision": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "recall": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        }
+      }
+    },
+    "evidence_reference_validity": {
+      "numerator": 17,
+      "denominator": 18,
+      "rate": 0.9444444444444444
+    },
+    "evidence_support_accuracy_adjudicated_only": {
+      "numerator": 5,
+      "denominator": 13,
+      "rate": 0.38461538461538464
+    },
+    "ambiguous_evidence_support_unadjudicated": 5,
+    "hard_filter_correctness": {
+      "numerator": 18,
+      "denominator": 18,
+      "rate": 1.0
+    },
+    "hard_filter_execution": {
+      "numerator": 18,
+      "denominator": 18,
+      "rate": 1.0
+    },
+    "hard_filter_correctness_when_aggregated": {
+      "numerator": 18,
+      "denominator": 18,
+      "rate": 1.0
+    },
+    "explicit_exclusion_end_to_end_success": {
+      "numerator": 1,
+      "denominator": 1,
+      "rate": 1.0
+    },
+    "explicit_exclusion_case_coverage": {
+      "numerator": 1,
+      "denominator": 1,
+      "rate": 1.0
+    },
+    "explicit_exclusion_accuracy_when_scored": {
+      "numerator": 1,
+      "denominator": 1,
+      "rate": 1.0
+    },
+    "false_unsupported_match_rate": {
+      "numerator": 5,
+      "denominator": 9,
+      "rate": 0.5555555555555556
+    },
+    "not_evidenced_handling_recall": {
+      "numerator": 3,
+      "denominator": 8,
+      "rate": 0.375
+    },
+    "explanation_completeness_structural": {
+      "numerator": 17,
+      "denominator": 18,
+      "rate": 0.9444444444444444
+    },
+    "schema_invariant_compliance": {
+      "numerator": 17,
+      "denominator": 18,
+      "rate": 0.9444444444444444
+    },
+    "first_pass_schema_invariant_validity": {
+      "numerator": 17,
+      "denominator": 18,
+      "rate": 0.9444444444444444
+    },
+    "post_repair_schema_invariant_validity": {
+      "numerator": 17,
+      "denominator": 18,
+      "rate": 0.9444444444444444
+    },
+    "end_to_end_aggregation_success": {
+      "numerator": 17,
+      "denominator": 18,
+      "rate": 0.9444444444444444
+    },
+    "deterministic_aggregation_reproducibility": {
+      "numerator": 18,
+      "denominator": 18,
+      "rate": 1.0
+    }
+  },
+  "per_case": [
+    {
+      "case_id": "case_01",
+      "status": "evaluated",
+      "first_pass_valid": true,
+      "post_repair_valid": true,
+      "hard_filter_executed": true,
+      "actual_hard_filter_violations": [],
+      "actual_requirement_outcomes": {
+        "r1": "not_evidenced"
+      },
+      "requirements": 1,
+      "exact_category_correct": 1,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_02",
+      "status": "evaluated",
+      "first_pass_valid": true,
+      "post_repair_valid": true,
+      "hard_filter_executed": true,
+      "actual_hard_filter_violations": [],
+      "actual_requirement_outcomes": {
+        "r1": "inferred_support"
+      },
+      "requirements": 1,
+      "exact_category_correct": 0,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_03",
+      "status": "evaluated",
+      "first_pass_valid": true,
+      "post_repair_valid": true,
+      "hard_filter_executed": true,
+      "actual_hard_filter_violations": [],
+      "actual_requirement_outcomes": {
+        "r1": "inferred_support"
+      },
+      "requirements": 1,
+      "exact_category_correct": 0,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_04",
+      "status": "evaluated",
+      "first_pass_valid": true,
+      "post_repair_valid": true,
+      "hard_filter_executed": true,
+      "actual_hard_filter_violations": [],
+      "actual_requirement_outcomes": {},
+      "requirements": 1,
+      "exact_category_correct": 0,
+      "category_denominator": 0,
+      "ambiguous_requirements_excluded": 1,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_05",
+      "status": "evaluated",
+      "first_pass_valid": true,
+      "post_repair_valid": true,
+      "hard_filter_executed": true,
+      "actual_hard_filter_violations": [],
+      "actual_requirement_outcomes": {
+        "r1": "inferred_support"
+      },
+      "requirements": 1,
+      "exact_category_correct": 0,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_06",
+      "status": "evaluated",
+      "first_pass_valid": true,
+      "post_repair_valid": true,
+      "hard_filter_executed": true,
+      "actual_hard_filter_violations": [],
+      "actual_requirement_outcomes": {
+        "r1": "inferred_support"
+      },
+      "requirements": 1,
+      "exact_category_correct": 0,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_07",
+      "status": "evaluated",
+      "first_pass_valid": true,
+      "post_repair_valid": true,
+      "hard_filter_executed": true,
+      "actual_hard_filter_violations": [],
+      "actual_requirement_outcomes": {
+        "r1": "not_evidenced"
+      },
+      "requirements": 1,
+      "exact_category_correct": 1,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_08",
+      "status": "evaluated",
+      "first_pass_valid": true,
+      "post_repair_valid": true,
+      "hard_filter_executed": true,
+      "actual_hard_filter_violations": [],
+      "actual_requirement_outcomes": {
+        "r1": "inferred_support"
+      },
+      "requirements": 1,
+      "exact_category_correct": 0,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_09",
+      "status": "evaluated",
+      "first_pass_valid": true,
+      "post_repair_valid": true,
+      "hard_filter_executed": true,
+      "actual_hard_filter_violations": [],
+      "actual_requirement_outcomes": {
+        "r1": "matched"
+      },
+      "requirements": 1,
+      "exact_category_correct": 1,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_10",
+      "status": "evaluated",
+      "first_pass_valid": true,
+      "post_repair_valid": true,
+      "hard_filter_executed": true,
+      "actual_hard_filter_violations": [],
+      "actual_requirement_outcomes": {
+        "r1": "inferred_support"
+      },
+      "requirements": 1,
+      "exact_category_correct": 0,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_11",
+      "status": "evaluated",
+      "first_pass_valid": true,
+      "post_repair_valid": true,
+      "hard_filter_executed": true,
+      "actual_hard_filter_violations": [],
+      "actual_requirement_outcomes": {},
+      "requirements": 1,
+      "exact_category_correct": 0,
+      "category_denominator": 0,
+      "ambiguous_requirements_excluded": 1,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_12",
+      "status": "evaluated",
+      "first_pass_valid": true,
+      "post_repair_valid": true,
+      "hard_filter_executed": true,
+      "actual_hard_filter_violations": [],
+      "actual_requirement_outcomes": {},
+      "requirements": 1,
+      "exact_category_correct": 0,
+      "category_denominator": 0,
+      "ambiguous_requirements_excluded": 1,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [
+        "r2"
+      ],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_13",
+      "status": "evaluated",
+      "first_pass_valid": true,
+      "post_repair_valid": true,
+      "hard_filter_executed": true,
+      "actual_hard_filter_violations": [],
+      "actual_requirement_outcomes": {
+        "r1": "not_evidenced"
+      },
+      "requirements": 1,
+      "exact_category_correct": 1,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_14",
+      "status": "evaluated",
+      "first_pass_valid": true,
+      "post_repair_valid": true,
+      "hard_filter_executed": true,
+      "actual_hard_filter_violations": [],
+      "actual_requirement_outcomes": {},
+      "requirements": 1,
+      "exact_category_correct": 0,
+      "category_denominator": 0,
+      "ambiguous_requirements_excluded": 1,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_15",
+      "status": "evaluated",
+      "first_pass_valid": true,
+      "post_repair_valid": true,
+      "hard_filter_executed": true,
+      "actual_hard_filter_violations": [
+        "Manual QA Tester"
+      ],
+      "actual_requirement_outcomes": {
+        "r1": "matched"
+      },
+      "requirements": 1,
+      "exact_category_correct": 1,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_16",
+      "status": "invalid_prediction",
+      "first_pass_valid": false,
+      "post_repair_valid": false,
+      "hard_filter_executed": true,
+      "actual_hard_filter_violations": [],
+      "actual_requirement_outcomes": {},
+      "requirements": 1,
+      "exact_category_correct": 0,
+      "category_denominator": 0,
+      "ambiguous_requirements_excluded": 1,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": [
+        "schema_or_invariant_failure:candidate_evidence_not_linked_to_record"
+      ]
+    },
+    {
+      "case_id": "case_17",
+      "status": "evaluated",
+      "first_pass_valid": true,
+      "post_repair_valid": true,
+      "hard_filter_executed": true,
+      "actual_hard_filter_violations": [],
+      "actual_requirement_outcomes": {
+        "r1": "matched"
+      },
+      "requirements": 1,
+      "exact_category_correct": 1,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    },
+    {
+      "case_id": "case_18",
+      "status": "evaluated",
+      "first_pass_valid": true,
+      "post_repair_valid": true,
+      "hard_filter_executed": true,
+      "actual_hard_filter_violations": [],
+      "actual_requirement_outcomes": {
+        "r1": "contradicted"
+      },
+      "requirements": 1,
+      "exact_category_correct": 1,
+      "category_denominator": 1,
+      "ambiguous_requirements_excluded": 0,
+      "hard_filter_checked": true,
+      "hard_filter_correct": true,
+      "unmatched_prediction_requirement_ids": [],
+      "missing_uncertainties": [],
+      "failure_categories": []
+    }
+  ],
+  "limitations": [
+    "Small synthetic benchmark; no real-world performance claim.",
+    "Five ambiguous evidence-support judgments were excluded from accuracy.",
+    "Predictions were generated in six separate clean projectless Codex tasks without access to golden labels, prior reports, or predictions.",
+    "Golden labels have not received independent human adjudication.",
+    "Explanations are checked for structural completeness, not semantic persuasiveness."
+  ],
+  "semantic_explanation_quality": {
+    "reviewed_requirement_count": 0,
+    "unresolved_requirement_count": 18,
+    "status": "pending_independent_human_adjudication",
+    "note": "The deterministic rationale-presence metric does not assess semantic persuasiveness; expected points are prepared in the review packet."
+  },
+  "label_adjudication": {
+    "source_first_and_engine_independent": true,
+    "independent_human_review": "not_performed",
+    "ambiguous_requirements_excluded_from_classification": 5
+  },
+  "run_manifest": {
+    "benchmark_version": "matching-challenge-v2.3.1-semantic",
+    "gold_version": "matching-challenge-golden-v2.3.1-semantic",
+    "prediction_run_id": "e6996d154bd841f3b3357cf6d75a7ce1",
+    "prediction_session_ids": [
+      "01a13b47-13df-7c82-8801-bdd283564f17",
+      "01a13b47-1c1c-7f60-84ac-8edb48088c8e",
+      "01a13b47-209b-7050-8a2f-e36c0c99ae3f",
+      "01a13b47-23bb-78f2-a2f2-1dae28bea9b4",
+      "01a13b47-26ea-73c1-81b0-d8e6637698e7",
+      "01a13b47-29eb-7a70-815c-fa042b35ed45"
+    ],
+    "input_sha256": "af81db064933b7faffde61eb8ffd51309d08a27fea70d3556b7bef4686a81234",
+    "golden_sha256": "b4a00bb4586950a7b71afd139b9d07ce5e5e9bb659abd45fcccb4ee3dbf195c2",
+    "package_sha256": "9b6ea483529cd1fc2d3ce564f57964bc17af7079a1239aba8321e78bbf160f6a",
+    "prediction_sha256": "9ab4df375892b29f9d9f331b88db88a8e585d92bbe7fdace34ad73f92615756a",
+    "implementation_sha256": {
+      "build_inputs.py": "75964505b4d3e4d9321d7f761e6979235d45757de2e6e50b56cea5135fa1ccb6",
+      "build_prediction_package.py": "4787a793f25333c50cd85e83d94be354b2d19095ad64a5e24d9c1cd880a00395",
+      "freeze.py": "ccbcfd73121e1adf54a3fcc6f069d4515d1ac97adae43aeb9aa1fdc9c3f74970",
+      "score_v2.3.1.py": "dcb285a65739f0862273af18a245846d767c40ed6d3f6cbd7c921306f781b6c1",
+      "evaluate_matching.py": "76828a346f318f2f21202b8ecb2aa7d89ae2f48b1a48827891e1e624e49ce0c5",
+      "match_opportunities.py": "1f83af96389c4b72fab8b16b437dc4a76bdd66c08338f02b2d0e6cd8b106472f",
+      "matching-assessment.schema.json": "980c6e19bd1b542b271b722e26ffc34ef637d283825d59568aa2b0ebdeac63ef",
+      "opportunity-matching.md": "d03abab2006ed286ed82d5c2cab952b0f9e938b14d47832560a50302df7dd576",
+      "matching-evidence-policy.md": "518d837d00de8209b4a4c46498fe4776395ed79e92c3c72a2da5004d583cfe66"
+    },
+    "frozen_at_utc": "2026-10-14T16:34:00+00:00",
+    "prediction_completed_at_utc": "2026-10-14T16:38:37+00:00",
+    "evaluated_at_utc": "2026-10-14T16:39:28+00:00"
+  },
+  "evaluation_procedure": {
+    "clean_prediction_tasks": 6,
+    "cases_per_task": 3,
+    "golden_labels_visible_to_prediction_tasks": false,
+    "prediction_contexts": "separate projectless Codex tasks",
+    "repair_attempts": 0,
+    "post_repair_validity_equals_first_pass": true,
+    "note": "One structurally invalid assessment remained invalid; no repair was attempted. Human label adjudication remains pending."
+  }
+}
