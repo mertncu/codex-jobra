@@ -33,8 +33,9 @@ candidate evidence, posting evidence, requirement slots, or preference refs.
    metadata such as a title or employer cannot stand in for a job requirement.
    Add other posting evidence only when its excerpt is relevant to the
    requirement (for example, a location restriction needed to assess work
-   eligibility). Python rejects unrelated supplementary citations. For career
-   alignment, `preference_refs` must refer only
+   eligibility). Python verifies that each citation exists and that the
+   requirement's own slot source is included; semantic relevance is judged by
+   Codex. For career alignment, `preference_refs` must refer only
    to preferred-role entries; `preference_terms` must be the exact resolved
    values. Locations, work arrangements, seniority preferences, and exclusions
    are not career preferences. Python applies explicit excluded-role checks
@@ -81,38 +82,32 @@ candidate evidence, posting evidence, requirement slots, or preference refs.
 
 ## Evidence and trust boundaries
 
-`matched` requires accepted candidate evidence, explicit extraction, a
-`direct_sufficient` semantic evidence judgment, and a minimal deterministic
-lexical relevance check. Its specific requirement terms must appear in a cited
-candidate excerpt; generic scope words such as “production” cannot borrow
-support from a different excerpt. Scope qualifiers such as production,
-professional work, architecture ownership, API implementation, and stated
-years must also be supported by excerpts attached to the cited records.
-`inferred_support` must be marked
-`analogous_uncertain`; it remains uncertain. Use
+Python checks structure and provenance: source inputs are valid, referenced
+IDs exist, candidate evidence is accepted and linked to the selected records,
+each requirement uses a catalog slot and cites that slot's source, and outcome
+and evidence-quality fields follow the contract. It does not decide whether a
+paraphrase is equivalent, whether an excerpt establishes production or
+professional scope, or whether a project demonstrates system ownership.
+`matched` requires explicit accepted evidence and `direct_sufficient`; whether
+that evidence really establishes every qualification is a semantic judgment.
+`inferred_support` must be marked `analogous_uncertain`; whether an analogy is
+relevant also remains semantic. Use
 `not_evidenced` without candidate references. Use `contradicted` only when
 accepted explicit candidate evidence states the contradiction. An unrelated
-but structurally valid reference is not proof of support: the lexical check
-catches obvious mismatches, while semantic sufficiency still requires Codex
-judgment and independent evaluation. Reference validity, relevance, and
-sufficiency are reported as distinct concepts.
+but structurally valid reference is not proof of support. Reference validity,
+record linkage, semantic relevance, and sufficiency are separate concepts;
+semantic failures belong in evaluation or human review rather than being
+guessed by lexical validator rules.
 
 For an uncertainty or conflict assessment, standalone accepted evidence may be
 cited without a candidate record when no record supports it. If record IDs are
 provided, every cited evidence item must link to at least one of those records.
 This preserves counterevidence such as an explicit user statement without
-inventing a profile record. The lexical checks are conservative diagnostics:
-they can reject paraphrases and do not establish semantic support. Codex still
-judges whether an analogy is relevant; validation never changes its outcome.
-
-For direct matches, Python also rejects a short set of explicit scope gaps:
-missing production context, professional context without a work record or
-explicit full-time/professional statement, architecture/ownership claims without
-design or ownership evidence, API implementation claims supported only by
-client consumption, and numeric years thresholds without sufficient explicit
-duration evidence. These conservative checks catch clear mismatches; equivalent
-wording may still need human review. Passing a check does not prove the source
-semantically entails the qualification.
+inventing a profile record. This is a provenance rule only; the validator does
+not inspect whether the excerpt supports the assessment. Scope disagreements,
+including related technologies, academic versus professional use, tool calling
+versus system ownership, and prototype versus production work, are handled by
+Codex interpretation and the evaluation/review process.
 
 Only explicit excluded-role preferences are hard filters. Employer requirements
 remain soft assessment dimensions. Missing skill mentions are `not_evidenced`,

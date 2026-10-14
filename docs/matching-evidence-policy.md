@@ -29,22 +29,45 @@ For matching assessments, use `direct_sufficient` only with `matched`,
 quality value itself remains a semantic judgment by Codex and is not
 independently proven by Python.
 
-For `matched`, at least one cited candidate excerpt must contain a specific
-technical or domain anchor from the requirement. Generic qualifier words such
-as “production” or “professional” cannot supply that anchor. When several
-excerpts support different facets, keep each excerpt attached to its own
-candidate record; Python checks direct-claim scope using only those linked
-source/record pairs. An excerpt that states an unrelated facet cannot fill a
-gap in the relevant excerpt.
+## Validator boundary
 
-The deterministic check is intentionally lexical. It can reject valid
-paraphrases and does not prove semantic entailment. A validation error leaves
-the semantic outcome untouched; Codex may make the documented bounded repair
-using the same evidence catalog. Python must not silently replace evidence or
-downgrade a classification. For `inferred_support`, Codex remains responsible
-for explaining why the cited activity is a relevant analogue and what it does
-not establish; a structurally valid ID or a shared technology word alone is
-not enough.
+Python checks schema validity, source and reference existence, accepted review
+state, candidate evidence-to-record linkage, requirement-slot source inclusion,
+preference resolution, and explicit deterministic constraints. It also enforces
+the contract pairing between classification and evidence quality. It does not
+compare requirement and resume wording to decide semantic relevance, infer
+responsibility scope, or conclude that a fact establishes production,
+professional, duration, or ownership experience.
+
+This boundary intentionally allows a structurally valid but semantically wrong
+`matched` assessment through validation. That is a false-acceptance risk in the
+full workflow and must be measured in semantic evaluation and addressed through
+Codex's rationale, review, or future reliability work. A lexical overlap rule
+would reduce some obvious false accepts, but it can reject valid paraphrases and
+still accept superficially similar claims with different responsibilities.
+Python never silently replaces references or changes classifications. A
+bounded repair must use the same reference catalog and preserve the original
+attempt. `inferred_support` requires the uncertain evidence-quality value, while
+the relevance of the proposed analogy remains semantic.
+
+## Calibration matrix
+
+The corresponding deterministic tests use the following expected boundary:
+
+| Scenario | Validator action | Semantic assessment |
+| --- | --- | --- |
+| Different wording with equivalent technical meaning | Accept if schema, IDs, and linkage are valid | Decide whether the paraphrase establishes the qualification |
+| Same keywords, different responsibility scope | Accept structure | Decide whether responsibility is actually evidenced |
+| Academic experience versus professional requirement | Accept structure | Assess the academic/professional gap; do not infer equivalence |
+| Tool usage versus system ownership | Accept structure | Assess whether the described activity supports ownership |
+| Production experience versus prototype | Accept structure | Assess whether the source establishes production scope |
+| Evidence attached to a different candidate record | Reject the broken record/evidence link | No semantic decision on invalid provenance |
+| Valid uncertainty evidence without a record reference | Accept known evidence ID and leave record refs empty | Explain the uncertainty or conflict; do not invent a record |
+
+Unknown IDs, unaccepted evidence, missing requirement-slot sources, malformed
+schemas, and inconsistent classification/quality pairs are objective invariant
+violations and are rejected. The validator does not treat mere ID validity as
+proof of support.
 
 ## Compare the actual qualification
 
