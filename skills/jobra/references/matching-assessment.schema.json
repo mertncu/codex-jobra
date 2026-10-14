@@ -24,12 +24,13 @@
     },
     "requirement": {
       "type": "object", "additionalProperties": false,
-      "required": ["id", "statement", "priority", "outcome", "job_evidence_ids", "candidate_record_ids", "candidate_evidence_ids", "rationale"],
+      "required": ["id", "statement", "priority", "outcome", "evidence_quality", "job_evidence_ids", "candidate_record_ids", "candidate_evidence_ids", "rationale"],
       "properties": {
         "id": {"$ref": "#/$defs/id"},
         "statement": {"$ref": "#/$defs/text"},
         "priority": {"enum": ["required", "preferred", "unspecified"]},
         "outcome": {"enum": ["matched", "inferred_support", "not_evidenced", "contradicted", "cannot_assess"]},
+        "evidence_quality": {"enum": ["direct_sufficient", "analogous_uncertain", "insufficient", "conflicting"]},
         "job_evidence_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
         "candidate_record_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
         "candidate_evidence_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
@@ -53,6 +54,7 @@
       "properties": {
         "outcome": {"enum": ["aligned", "partial", "not_aligned", "uncertain"]},
         "preference_terms": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/text"}},
+        "preference_refs": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
         "job_evidence_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/id"}},
         "rationale": {"$ref": "#/$defs/text"}
       }

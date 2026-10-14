@@ -40,13 +40,13 @@ class MatchingEvaluationTests(unittest.TestCase):
 
     def prediction(self, invalid_ref=False, omit_second=False):
         candidate_evidence = "bad_ref" if invalid_ref else "ev_skill"
-        requirements = [{"id": "req_python", "statement": "Python is required", "priority": "required",
-                         "outcome": "matched", "job_evidence_ids": ["job_direct_req_py"],
+        requirements = [{"id": "r1", "statement": "Python is required", "priority": "required",
+                         "outcome": "matched", "evidence_quality": "direct_sufficient", "job_evidence_ids": ["job_direct_req_py"],
                          "candidate_record_ids": ["skill_1"], "candidate_evidence_ids": [candidate_evidence],
                          "rationale": "The confirmed profile explicitly lists Python."}]
         if not omit_second:
-            requirements.append({"id": "req_kubernetes", "statement": "Kubernetes preferred", "priority": "preferred",
-                                 "outcome": "not_evidenced", "job_evidence_ids": ["job_direct_req_k8s"],
+            requirements.append({"id": "r2", "statement": "Kubernetes preferred", "priority": "preferred",
+                                 "outcome": "not_evidenced", "evidence_quality": "insufficient", "job_evidence_ids": ["job_direct_req_k8s"],
                                  "candidate_record_ids": [], "candidate_evidence_ids": [],
                                  "rationale": "No confirmed candidate evidence mentions Kubernetes."})
         assessment = {"schema_version": "1", "assessments": [{"opportunity_id": "job_direct",

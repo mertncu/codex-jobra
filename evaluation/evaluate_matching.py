@@ -14,7 +14,9 @@ from uuid import uuid4
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "skills/jobra/scripts"))
 from local_storage import write_private_json_atomic
-from match_opportunities import MatchError, build_match_results, validate_matching_inputs
+from match_opportunities import (MatchError, build_match_results,
+                                 build_match_results_resilient,
+                                 validate_matching_inputs)
 
 POSITIVE = {"matched", "inferred_support"}
 CATEGORIES = ("matched", "inferred_support", "not_evidenced", "contradicted", "cannot_assess")
@@ -25,6 +27,22 @@ def _metric(numerator, denominator):
             "rate": numerator / denominator if denominator else None}
 
 
+def _align_prediction_requirements(gold_requirements, predicted_requirements):
+    """Align agent-assigned IDs to frozen labels by source evidence references."""
+    remaining = list(predicted_requirements.values())
+    aligned = {}
+    for gold in gold_requirements:
+        match = next((item for item in remaining if item.get("id") == gold["id"]), None)
+        if match is None:
+            sources = set(gold.get("job_evidence_ids", []))
+            candidates = [item for item in remaining if sources.intersection(item.get("job_evidence_ids", []))]
+            match = candidates[0] if len(candidates) == 1 else None
+        if match is not None:
+            aligned[gold["id"]] = match
+            remaining.remove(match)
+    return aligned, remaining
+
+
 def evaluate(benchmark, golden, predictions, evaluation_date, *, exclude_ambiguous_support=False):
     cases = {item["id"]: item for item in benchmark["cases"]}
     candidate_gold = {item["case_id"]: item for item in golden["cases"]}
@@ -32,10 +50,10 @@ def evaluate(benchmark, golden, predictions, evaluation_date, *, exclude_ambiguo
     opportunity_by_id = {item["id"]: item for item in benchmark["opportunities"]["opportunities"]}
     per_case, flattened = [], []
     attempted = 0
-    valid_cases = 0
+    valid_cases = first_pass_valid = hard_executed = 0
     ref_valid = 0
     ref_total = 0
-    hard_ok = hard_scored = explanation_ok = aggregation_ok = 0
+    hard_ok = hard_scored = explanation_ok = aggregation_ok = aggregation_checks = 0
     explicit_filter_total = sum(bool(item["hard_filter_violations"]) for item in golden["cases"])
     explicit_filter_scored = explicit_filter_ok = 0
     support_ok = 0
@@ -78,19 +96,29 @@ def evaluate(benchmark, golden, predictions, evaluation_date, *, exclude_ambiguo
         opportunity = opportunity_by_id[case["opportunity"]]
         one_document = {"schema_version": "1", "opportunities": [opportunity]}
         errors = []
+        passed_first_pass = False
         try:
             validate_matching_inputs(profile, preferences, one_document, assessment)
-            valid_cases += 1
-            rebuilt = build_match_results(profile, preferences, one_document, assessment,
-                                          evaluated_at=f"{evaluation_date}T00:00:00Z")
+            first_pass_valid += 1
+            passed_first_pass = True
         except MatchError as exc:
-            rebuilt = None
             # MatchError contains a fixed validator code, never user content.
             errors.append(f"schema_or_invariant_failure:{exc}")
         except ValueError:
-            rebuilt = None
             errors.append("validation_failure")
+        repair = prediction.get("repair_assessment")
+        try:
+            rebuilt = build_match_results_resilient(profile, preferences, one_document,
+                assessment, repair, evaluated_at=f"{evaluation_date}T00:00:00Z")
+        except (MatchError, ValueError):
+            rebuilt = None
+        resilient_output = rebuilt.get("results", [{}])[0] if rebuilt else {}
+        semantically_aggregated = resilient_output.get("semantic_assessment", {}).get("status") == "aggregated"
+        valid_cases += bool(semantically_aggregated)
+        if resilient_output.get("hard_filter", {}).get("status") == "computed":
+            hard_executed += 1
         if rebuilt is not None and actual_result is not None:
+            aggregation_checks += 1
             # A caller may have used a different timestamp; compare substantive deterministic fields.
             got = actual_result.get("results", [])
             want = rebuilt.get("results", [])
@@ -100,21 +128,25 @@ def evaluate(benchmark, golden, predictions, evaluation_date, *, exclude_ambiguo
                 aggregation_ok += 1
             else:
                 errors.append("deterministic_aggregation_mismatch")
-        result = actual_result if actual_result is not None else rebuilt
+        result = rebuilt
         output = result.get("results", [{}])[0] if result else {}
         pred_assessment = assessment.get("assessments", [{}])[0]
         pred_reqs = {item["id"]: item for item in pred_assessment.get("requirements", [])}
         gold_reqs = {item["id"]: item for item in expected["requirements"]}
+        aligned_reqs, unmatched_predictions = _align_prediction_requirements(
+            expected["requirements"], pred_reqs)
         case_correct = 0
+        aligned_outcomes = {}
         case_scored = sum(1 for req in gold_reqs.values()
                           if not exclude_ambiguous_support or req["evidence_support"] != "ambiguous")
         for req_id, gold_req in gold_reqs.items():
-            pred_req = pred_reqs.get(req_id)
+            pred_req = aligned_reqs.get(req_id)
             if pred_req is None:
                 continue
             if exclude_ambiguous_support and gold_req["evidence_support"] == "ambiguous":
                 continue
             truth, guess = gold_req["expected"], pred_req["outcome"]
+            aligned_outcomes[req_id] = guess
             confusion[truth][guess] += 1
             flattened.append((truth, guess))
             case_correct += truth == guess
@@ -131,8 +163,8 @@ def evaluate(benchmark, golden, predictions, evaluation_date, *, exclude_ambiguo
                 support_ok += (got_ids == expected_ids and
                                ((gold_req["evidence_support"] == "supported" and guess in POSITIVE | {"contradicted"}) or
                                 (gold_req["evidence_support"] == "unsupported" and not got_ids)))
-        unmatched_ids = sorted(set(pred_reqs) - set(gold_reqs))
-        unmatched_positive += sum(pred_reqs[req_id]["outcome"] in POSITIVE for req_id in unmatched_ids)
+        unmatched_ids = sorted(item["id"] for item in unmatched_predictions)
+        unmatched_positive += sum(item["outcome"] in POSITIVE for item in unmatched_predictions)
         # Structural reference integrity spans requirement, experience, and
         # career assessments; semantic entailment is scored separately above.
         job_evidence = {item["id"] for item in opportunity["evidence"]}
@@ -166,7 +198,8 @@ def evaluate(benchmark, golden, predictions, evaluation_date, *, exclude_ambiguo
                 refs_valid_for_case = False
         ref_total += 1
         ref_valid += refs_valid_for_case
-        hard_checked = bool(output.get("opportunity_id"))
+        hard_checked = (output.get("hard_filter", {}).get("status") == "computed" or
+                        bool(output.get("opportunity_id")))
         hard_correct = set(output.get("hard_filter_violations", [])) == set(expected["hard_filter_violations"])
         if hard_checked:
             hard_scored += 1
@@ -181,7 +214,12 @@ def evaluate(benchmark, golden, predictions, evaluation_date, *, exclude_ambiguo
         missing_warnings = sorted(set(expected["required_uncertainties"]) - got_warnings)
         if missing_warnings:
             errors.append("required_uncertainty_warning_missing")
-        per_case.append({"case_id": case_id, "status": "evaluated" if rebuilt else "invalid_prediction",
+        per_case.append({"case_id": case_id, "status": "evaluated" if semantically_aggregated else "invalid_prediction",
+                         "first_pass_valid": passed_first_pass,
+                         "post_repair_valid": bool(semantically_aggregated),
+                         "hard_filter_executed": hard_checked,
+                         "actual_hard_filter_violations": output.get("hard_filter_violations", []),
+                         "actual_requirement_outcomes": aligned_outcomes,
                          "requirements": len(gold_reqs), "exact_category_correct": int(case_correct),
                          "category_denominator": case_scored,
                          "ambiguous_requirements_excluded": sum(1 for req in gold_reqs.values()
@@ -212,6 +250,7 @@ def evaluate(benchmark, golden, predictions, evaluation_date, *, exclude_ambiguo
         "evidence_support_accuracy_adjudicated_only": _metric(support_ok, support_total),
         "ambiguous_evidence_support_unadjudicated": ambiguous,
         "hard_filter_correctness": _metric(hard_ok, hard_total),
+        "hard_filter_execution": _metric(hard_executed, attempted),
         "hard_filter_correctness_when_aggregated": _metric(hard_ok, hard_scored),
         "explicit_exclusion_end_to_end_success": _metric(explicit_filter_ok, explicit_filter_total),
         "explicit_exclusion_case_coverage": _metric(explicit_filter_scored, explicit_filter_total),
@@ -220,7 +259,10 @@ def evaluate(benchmark, golden, predictions, evaluation_date, *, exclude_ambiguo
         "not_evidenced_handling_recall": _metric(not_evidenced_ok, not_evidenced_total),
         "explanation_completeness_structural": _metric(explanation_ok, explanation_total),
         "schema_invariant_compliance": _metric(valid_cases, attempted),
-        "deterministic_aggregation_reproducibility": _metric(aggregation_ok, attempted)
+        "first_pass_schema_invariant_validity": _metric(first_pass_valid, attempted),
+        "post_repair_schema_invariant_validity": _metric(valid_cases, attempted),
+        "end_to_end_aggregation_success": _metric(valid_cases, attempted),
+        "deterministic_aggregation_reproducibility": _metric(aggregation_ok, aggregation_checks)
     }
     return {"report_version": "matching-evaluation-v1", "dataset_version": benchmark["dataset_version"],
             "gold_version": golden["gold_version"], "evaluation_date": evaluation_date,
@@ -251,11 +293,15 @@ def render_markdown(report):
              f"| Supported match recall | {fmt('supported_match_recall')} |",
              f"| Evidence reference validity | {fmt('evidence_reference_validity')} |",
              f"| Adjudicated evidence support accuracy | {fmt('evidence_support_accuracy_adjudicated_only')} |",
+             f"| Hard-filter execution | {fmt('hard_filter_execution')} |",
              f"| Hard-filter correctness | {fmt('hard_filter_correctness')} |",
              f"| False unsupported-match rate | {fmt('false_unsupported_match_rate')} |",
              f"| Not-evidenced handling recall | {fmt('not_evidenced_handling_recall')} |",
              f"| Explanation completeness (structural) | {fmt('explanation_completeness_structural')} |",
+             f"| First-pass schema/invariant validity | {fmt('first_pass_schema_invariant_validity')} |",
+             f"| Post-repair schema/invariant validity | {fmt('post_repair_schema_invariant_validity')} |",
              f"| Schema/invariant compliance | {fmt('schema_invariant_compliance')} |",
+             f"| End-to-end aggregation success | {fmt('end_to_end_aggregation_success')} |",
              f"| Aggregation reproducibility | {fmt('deterministic_aggregation_reproducibility')} |", "",
              f"Ambiguous evidence judgments excluded: {metrics['ambiguous_evidence_support_unadjudicated']}", "",
              "| Case | Status | Exact labels | Hard filter | Uncertainty omissions |", "|---|---|---:|---|---:|"]

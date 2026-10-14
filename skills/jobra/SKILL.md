@@ -15,8 +15,12 @@ reviews a saved draft; read [the profile workflow](references/profile-workflow.m
 For `discover`, read [the discovery workflow](references/discover-workflow.md).
 For matching, read [the matching workflow](../../docs/opportunity-matching.md).
 Matching accepts only a verified profile, separate preferences, validated
-opportunities, and evidence-linked Codex interpretation; it never writes to
-those inputs. `research` and `results` remain future workflows.
+opportunities, a deterministic local reference catalog, and evidence-linked
+Codex interpretation. Python independently evaluates explicit exclusions,
+validates references, aggregates valid semantics, and preserves one bounded
+repair attempt for audit; it never writes to source inputs. See the matching
+workflow for the exact catalog and repair procedure. `research` and `results`
+remain future workflows.
 The [opportunity schema](references/opportunities.schema.json) and
 `scripts/validate_opportunities.py` validate snapshots; live discovery uses
 Codex's available web tools, not a Python search backend.
