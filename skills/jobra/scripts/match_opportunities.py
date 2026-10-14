@@ -41,6 +41,100 @@ def _substantive_terms(value):
     return {term for term in _norm(value).split() if len(term) > 1 and term not in _MATCH_STOPWORDS}
 
 
+_SCOPE_WORDS = {"professional", "commercial", "production", "prod", "grade", "full", "time",
+                "ownership", "owner", "architecture", "architect", "design", "designed",
+                "develop", "developed", "development", "implement", "implemented",
+                "operate", "operated", "operation", "operations", "deploy", "deployed",
+                "experience", "experienced", "years", "year", "minimum", "required",
+                "requirement", "requirements", "ability", "knowledge", "skill", "skills",
+                "experience", "engineer", "engineering", "developer", "development"}
+
+
+def _requirement_anchors(statement):
+    """Return specific terms after removing qualification scope/action words."""
+    return _substantive_terms(statement) - _SCOPE_WORDS
+
+
+def _evidence_pairs(record_refs, evidence_refs, candidate_records, candidate_evidence):
+    """Keep each source excerpt paired only with records that cite that excerpt."""
+    pairs = []
+    for evidence_id in evidence_refs:
+        evidence = candidate_evidence.get(evidence_id, {})
+        excerpt = evidence.get("excerpt", "") or ""
+        linked_records = [(section, record) for record_id in record_refs
+                          if record_id in candidate_records
+                          for section, record in [candidate_records[record_id]]
+                          if evidence_id in record.get("evidence_ids", [])]
+        if not linked_records:
+            pairs.append((evidence_id, excerpt, []))
+        else:
+            pairs.extend((evidence_id, excerpt, [(section, record)])
+                         for section, record in linked_records)
+    return pairs
+
+
+def _direct_qualification_gaps(statement, record_refs, evidence_refs,
+                               candidate_records, candidate_evidence):
+    """Conservative deterministic checks for explicit scope/threshold qualifiers.
+
+    These checks can reject an obvious unsupported direct claim. Passing them
+    does not establish semantic sufficiency; that still requires Codex review.
+    """
+    requirement = _norm(statement)
+    anchors = _requirement_anchors(statement)
+    pairs = _evidence_pairs(record_refs, evidence_refs, candidate_records, candidate_evidence)
+    relevant_pairs = [(excerpt, linked) for _, excerpt, linked in pairs
+                      if not anchors or anchors.intersection(_substantive_terms(excerpt))]
+    candidate_text = " ".join(
+        excerpt + " " + " ".join(
+            section + " " + " ".join(value for value in record.values() if isinstance(value, str))
+            for section, record in linked)
+        for excerpt, linked in relevant_pairs).casefold()
+    gaps = []
+
+    if re.search(r"\bproduction(?:al)?\b|\bprod[- ]grade\b", requirement) and not re.search(
+            r"\bproduction(?:al)?\b|\bprod[- ]grade\b", candidate_text):
+        gaps.append("production_context_not_explicit")
+    if re.search(r"\bprofessional\b|\bcommercial\b", requirement):
+        has_work_record = any(section == "experience" and record.get("kind") == "work"
+                              for _, linked in relevant_pairs for section, record in linked)
+        has_explicit_context = bool(re.search(r"\bprofessional\b|\bcommercial\b|\bfull[- ]time\b", candidate_text))
+        if not (has_work_record or has_explicit_context):
+            gaps.append("professional_context_not_evidenced")
+    if re.search(r"\b(owner|ownership|architect|architecture)\b", requirement) and not re.search(
+            r"\b(owned|ownership|architected|architecture|designed|design lead|technical lead)\b", candidate_text):
+        gaps.append("ownership_or_architecture_not_evidenced")
+    if re.search(r"\bapis?\b", requirement) and re.search(
+            r"\b(design|designed|develop|developed|implement|implemented|versioned|create|created)\b", requirement) and not re.search(
+            r"\b(api endpoint|api endpoints|rest endpoint|rest endpoints|designed .*api|developed .*api|implemented .*api|versioned .*api)\b", candidate_text):
+        gaps.append("api_implementation_not_evidenced")
+
+    threshold = re.search(r"\b(?:at least|minimum of|min(?:imum)?)\s+(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+(?:full\s+)?years?\b", requirement)
+    if threshold:
+        count = threshold.group(1)
+        required_months = (int(count) if count.isdigit() else {
+            "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+            "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10}[count]) * 12
+        months = []
+        relevant_record_ids = {record.get("id") for _, linked in relevant_pairs
+                               for _, record in linked}
+        for _, (section, record) in candidate_records.items():
+            if section != "experience" or record.get("kind") != "work" or record.get("id") not in relevant_record_ids:
+                continue
+            period = record.get("period", "")
+            match = re.search(r"\b(\d{4})-(\d{2})\s+to\s+(\d{4})-(\d{2})\b", period)
+            if match:
+                start_year, start_month, end_year, end_month = map(int, match.groups())
+                if 1 <= start_month <= 12 and 1 <= end_month <= 12:
+                    months.append((end_year - start_year) * 12 + end_month - start_month + 1)
+        stated = re.search(r"\b(\d+)\+?\s+years?\s+(?:of\s+)?(?:professional|commercial|full[- ]time)\b", candidate_text)
+        if stated:
+            months.append(int(stated.group(1)) * 12)
+        if not months or max(months) < required_months:
+            gaps.append("explicit_experience_duration_below_or_unavailable")
+    return gaps
+
+
 def validate_matching_sources(profile, preferences, opportunity_document):
     """Validate immutable source inputs, independently of Codex interpretation."""
     if validate_document(profile, "candidate_profile") or profile.get("verification_status") != "verified":
@@ -85,7 +179,25 @@ def build_reference_catalog(profile, preferences, opportunity_document):
     opportunity_catalog = []
     for opportunity in opportunity_document["opportunities"]:
         evidence_lookup = {item["id"]: item for item in opportunity["evidence"]}
-        description_ids = opportunity["claims"]["description"]["evidence_ids"]
+        # Some source records use one full posting-body excerpt for every field;
+        # keep that broad source available. Exclude evidence whose location is
+        # explicitly metadata-only so titles/employers cannot become invented
+        # requirement slots just because the description claim references them.
+        metadata_locations = {"title", "employer", "location", "arrangement",
+                              "work arrangement", "work_arrangement", "seniority",
+                              "status", "salary", "employment type", "employment_type",
+                              "posting date", "posting_date"}
+        metadata_values = {_norm(opportunity["claims"][field]["value"])
+                           for field in ("title", "employer", "location", "work_arrangement",
+                                         "seniority", "status", "salary", "employment_type",
+                                         "posting_date")
+                           if opportunity["claims"][field]["value"]}
+        description_ids = [evidence_id for evidence_id in
+                           opportunity["claims"]["description"]["evidence_ids"]
+                           if (str(evidence_lookup[evidence_id].get("location", "")).strip().casefold()
+                               not in metadata_locations
+                               and _norm(evidence_lookup[evidence_id].get("excerpt", ""))
+                               not in metadata_values)]
         requirement_slots = []
         for index, evidence_id in enumerate(description_ids, 1):
             evidence = evidence_lookup[evidence_id]
@@ -129,7 +241,9 @@ def _assessment_errors(profile, preferences, opportunities, candidate_records,
     errors = []
     catalog = build_reference_catalog(profile, preferences,
         {"schema_version": "1", "opportunities": [opportunity]})
-    allowed_requirement_ids = {item["requirement_id"] for item in catalog["opportunities"][0]["requirement_slots"]}
+    requirement_slots = {item["requirement_id"]: item for item in
+                         catalog["opportunities"][0]["requirement_slots"]}
+    allowed_requirement_ids = set(requirement_slots)
     if any(item["id"] not in allowed_requirement_ids for item in assessment["requirements"]):
         errors.append({"path": "requirements.id", "code": "unknown_requirement_reference"})
     req_ids = [item["id"] for item in assessment["requirements"]]
@@ -177,6 +291,18 @@ def _assessment_errors(profile, preferences, opportunities, candidate_records,
         outcome = req["outcome"]
         if not req["job_evidence_ids"]:
             errors.append({"path": path + ".job_evidence_ids", "code": "requirement_missing_job_evidence"})
+        elif req["id"] in requirement_slots and requirement_slots[req["id"]]["job_evidence_id"] not in req["job_evidence_ids"]:
+            errors.append({"path": path + ".job_evidence_ids", "code": "requirement_slot_evidence_missing"})
+        else:
+            anchors = _requirement_anchors(req["statement"])
+            slot_source = requirement_slots.get(req["id"], {}).get("job_evidence_id")
+            for evidence_id in req["job_evidence_ids"]:
+                if evidence_id == slot_source or not anchors:
+                    continue
+                excerpt = job_evidence.get(evidence_id, {}).get("excerpt", "") or ""
+                if not anchors.intersection(_substantive_terms(excerpt)):
+                    errors.append({"path": path + ".job_evidence_ids",
+                                   "code": "job_evidence_outside_requirement_scope"})
         if outcome in ("matched", "inferred_support") and (
                 not req["candidate_record_ids"] or not req["candidate_evidence_ids"]):
             errors.append({"path": path, "code": "positive_match_missing_candidate_evidence"})
@@ -201,10 +327,25 @@ def _assessment_errors(profile, preferences, opportunities, candidate_records,
             if not requirement_terms.intersection(_substantive_terms(evidence_text + " " + record_text)):
                 errors.append({"path": path + ".candidate_evidence_ids",
                                "code": "matched_candidate_evidence_not_lexically_relevant"})
-        if outcome == "inferred_support" and quality not in ("analogous_uncertain", "direct_sufficient"):
-            errors.append({"path": path + ".evidence_quality", "code": "inferred_support_requires_quality_assessment"})
+            anchors = _requirement_anchors(req["statement"])
+            if anchors and not any(anchors.intersection(_substantive_terms(
+                    candidate_evidence.get(ref, {}).get("excerpt", "") or ""))
+                    for ref in req["candidate_evidence_ids"]):
+                errors.append({"path": path + ".candidate_evidence_ids",
+                               "code": "matched_candidate_source_outside_requirement_scope"})
+            for gap in _direct_qualification_gaps(req["statement"], req["candidate_record_ids"],
+                    req["candidate_evidence_ids"], candidate_records, candidate_evidence):
+                errors.append({"path": path + ".outcome", "code": "matched_qualification_facet_" + gap})
+        if outcome == "inferred_support" and quality != "analogous_uncertain":
+            errors.append({"path": path + ".evidence_quality", "code": "inferred_support_requires_analogous_uncertain_evidence"})
         if quality == "insufficient" and outcome in ("matched", "inferred_support"):
             errors.append({"path": path + ".outcome", "code": "insufficient_evidence_cannot_support_positive_match"})
+        if outcome == "not_evidenced" and quality != "insufficient":
+            errors.append({"path": path + ".evidence_quality", "code": "not_evidenced_requires_insufficient_evidence"})
+        if outcome == "contradicted" and quality != "conflicting":
+            errors.append({"path": path + ".evidence_quality", "code": "contradiction_requires_conflicting_evidence_quality"})
+        if outcome == "cannot_assess" and quality not in ("insufficient", "conflicting"):
+            errors.append({"path": path + ".evidence_quality", "code": "cannot_assess_requires_insufficient_or_conflicting_evidence"})
     return errors
 
 

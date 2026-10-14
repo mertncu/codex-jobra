@@ -130,6 +130,99 @@ class MatchingTests(unittest.TestCase):
         self.assertIn("some_requirement_matches_are_inference_dependent", result["warnings"])
         self.assertIn("disclose candidate data", self.opportunity["evidence"][0]["excerpt"])
 
+    def test_evidence_quality_must_match_the_existing_classification(self):
+        cases = [
+            ("inferred_support", "direct_sufficient", "inferred_support_requires_analogous_uncertain_evidence"),
+            ("not_evidenced", "direct_sufficient", "not_evidenced_requires_insufficient_evidence"),
+            ("cannot_assess", "direct_sufficient", "cannot_assess_requires_insufficient_or_conflicting_evidence"),
+        ]
+        for outcome, quality, expected_error in cases:
+            with self.subTest(outcome=outcome, quality=quality):
+                self.setUp()
+                req = self.assessment["assessments"][0]["requirements"][0]
+                req["outcome"] = outcome
+                req["evidence_quality"] = quality
+                if outcome == "not_evidenced":
+                    req["candidate_record_ids"] = []
+                    req["candidate_evidence_ids"] = []
+                with self.assertRaisesRegex(MatchError, expected_error):
+                    self._result()
+
+        self.setUp()
+        self.profile["evidence"].append({"id": "ev_no_python", "source_document_id": "synthetic_resume",
+            "excerpt": "I have not used Python.", "extraction": "explicit", "review_status": "confirmed"})
+        req = self.assessment["assessments"][0]["requirements"][0]
+        req.update(outcome="contradicted", evidence_quality="insufficient",
+                   candidate_record_ids=[], candidate_evidence_ids=["ev_no_python"])
+        with self.assertRaisesRegex(MatchError, "contradiction_requires_conflicting_evidence_quality"):
+            self._result()
+
+    def test_direct_matches_must_establish_material_qualification_facets(self):
+        qualifier_cases = [
+            ("Python production experience is required.", "matched_qualification_facet_production_context_not_explicit"),
+            ("Python professional experience is required.", "matched_qualification_facet_professional_context_not_evidenced"),
+            ("Python architecture ownership experience is required.", "matched_qualification_facet_ownership_or_architecture_not_evidenced"),
+        ]
+        for statement, expected_error in qualifier_cases:
+            with self.subTest(statement=statement):
+                self.setUp()
+                req = self.assessment["assessments"][0]["requirements"][0]
+                req["statement"] = statement
+                with self.assertRaisesRegex(MatchError, expected_error):
+                    self._result()
+
+        self.setUp()
+        req = self.assessment["assessments"][0]["requirements"][0]
+        req["statement"] = "Design and implement versioned REST APIs using Python."
+        self.profile["evidence"][-2]["excerpt"] = "Integrated a third-party REST API with Python using a client SDK."
+        with self.assertRaisesRegex(MatchError, "matched_qualification_facet_api_implementation_not_evidenced"):
+            self._result()
+
+    def test_incomplete_dates_cannot_prove_a_years_threshold_but_full_dates_can(self):
+        req = self.assessment["assessments"][0]["requirements"][0]
+        req["statement"] = "At least three full years of professional software engineering experience are required."
+        req["candidate_record_ids"] = ["exp_1"]
+        req["candidate_evidence_ids"] = ["ev_intern"]
+        with self.assertRaisesRegex(MatchError, "matched_qualification_facet_professional_context_not_evidenced"):
+            self._result()
+
+        self.profile["experience"][0].update(kind="work", period="2021-01 to 2024-12", role="Software Engineer")
+        evidence = next(item for item in self.profile["evidence"] if item["id"] == "ev_intern")
+        evidence["excerpt"] = "Full-time professional Software Engineer from January 2021 through December 2024."
+        self.assertTrue(validate_matching_inputs(self.profile, self.preferences,
+            self.opportunities, self.assessment))
+
+    def test_direct_scope_qualifiers_must_share_a_relevant_source_excerpt(self):
+        req = self.assessment["assessments"][0]["requirements"][0]
+        req["statement"] = "Python production experience is required."
+        self.profile["evidence"].append({"id": "ev_prod", "source_document_id": "synthetic_resume",
+            "excerpt": "Production engineering", "extraction": "explicit", "review_status": "confirmed"})
+        self.profile["technical_skills"][0]["evidence_ids"] = ["ev_skill", "ev_prod"]
+        req["candidate_evidence_ids"] = ["ev_skill", "ev_prod"]
+        with self.assertRaisesRegex(MatchError, "matched_qualification_facet_production_context_not_explicit"):
+            self._result()
+
+    def test_matched_classification_needs_a_scoped_source_excerpt(self):
+        self.profile["evidence"].append({"id": "ev_unrelated", "source_document_id": "synthetic_resume",
+            "excerpt": "Managed office catering schedules.", "extraction": "explicit", "review_status": "confirmed"})
+        self.profile["technical_skills"][0]["evidence_ids"] = ["ev_unrelated"]
+        self.assessment["assessments"][0]["requirements"][0]["candidate_evidence_ids"] = ["ev_unrelated"]
+        with self.assertRaisesRegex(MatchError, "matched_candidate_source_outside_requirement_scope"):
+            self._result()
+
+    def test_uncertain_assessment_can_cite_unlinked_source_without_fabricating_a_record(self):
+        self.profile["evidence"].append({"id": "ev_counterclaim", "source_document_id": "synthetic_resume",
+            "excerpt": "I have never used Python.", "extraction": "explicit", "review_status": "confirmed"})
+        req = self.assessment["assessments"][0]["requirements"][0]
+        req.update(outcome="cannot_assess", evidence_quality="conflicting",
+                   candidate_record_ids=[], candidate_evidence_ids=["ev_counterclaim"])
+        self.assertTrue(validate_matching_inputs(self.profile, self.preferences,
+            self.opportunities, self.assessment))
+
+        req["candidate_record_ids"] = ["skill_1"]
+        with self.assertRaisesRegex(MatchError, "candidate_evidence_not_linked_to_record"):
+            self._result()
+
     def test_snapshots_are_new_private_files_and_inputs_stay_unchanged(self):
         before = copy.deepcopy((self.profile, self.preferences, self.opportunities))
         result = self._result()
@@ -148,6 +241,35 @@ class MatchingTests(unittest.TestCase):
             if item["evidence_id"] == "ev_skill")["source_document_id"])
         self.assertIn("r1", [item["requirement_id"] for item in catalog["opportunities"][0]["requirement_slots"]])
         self.assertIn("pref_preferred_roles_001", [item["reference_id"] for item in catalog["preferences"]])
+
+    def test_requirement_slots_exclude_metadata_evidence(self):
+        # The description evidence list can be broad; metadata references must
+        # never be offered as semantic job requirements.
+        for field, evidence_id in (("title", "ev_title"), ("employer", "ev_employer"),
+                                   ("location", "ev_location")):
+            self.opportunity["claims"][field]["evidence_ids"] = [evidence_id]
+            evidence = copy.deepcopy(self.opportunity["evidence"][0])
+            evidence.update(id=evidence_id, location="posting header",
+                            excerpt=self.opportunity["claims"][field]["value"])
+            self.opportunity["evidence"].append(evidence)
+            self.opportunity["claims"]["description"]["evidence_ids"].append(evidence_id)
+        slots = build_reference_catalog(self.profile, self.preferences, self.opportunities)[
+            "opportunities"][0]["requirement_slots"]
+        self.assertEqual(["ev_1"], [item["job_evidence_id"] for item in slots])
+        req = self.assessment["assessments"][0]["requirements"][0]
+        req["job_evidence_ids"] = ["ev_title"]
+        with self.assertRaisesRegex(MatchError, "requirement_slot_evidence_missing"):
+            self._result()
+        req["job_evidence_ids"] = ["ev_1", "ev_title"]
+        with self.assertRaisesRegex(MatchError, "job_evidence_outside_requirement_scope"):
+            self._result()
+
+        # Relevant metadata can supplement the requirement's own source, such
+        # as a location clause needed to assess eligibility.
+        req["statement"] = "Python experience in London is required."
+        req["job_evidence_ids"] = ["ev_1", "ev_location"]
+        self.assertTrue(validate_matching_inputs(self.profile, self.preferences,
+            self.opportunities, self.assessment))
 
     def test_invalid_candidate_reference_keeps_independent_exclusion_result(self):
         self.opportunity["claims"]["title"]["value"] = "Sales Engineer"

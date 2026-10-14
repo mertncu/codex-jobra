@@ -16,11 +16,16 @@ For `discover`, read [the discovery workflow](references/discover-workflow.md).
 For matching, read [the matching workflow](../../docs/opportunity-matching.md).
 Matching accepts only a verified profile, separate preferences, validated
 opportunities, a deterministic local reference catalog, and evidence-linked
-Codex interpretation. Python independently evaluates explicit exclusions,
-validates references, aggregates valid semantics, and preserves one bounded
+Codex interpretation. Cite each requirement's catalog source and explain how
+candidate excerpts cover its scope; a valid ID alone does not establish support.
+Python independently evaluates explicit exclusions, validates references,
+aggregates valid semantics, and preserves one bounded
 repair attempt for audit; it never writes to source inputs. See the matching
-workflow for the exact catalog and repair procedure. `research` and `results`
-remain future workflows.
+workflow for the exact catalog and repair procedure, and apply its
+[evidence-sufficiency policy](../../docs/matching-evidence-policy.md) to every
+requirement. A matching rationale must explain how evidence supports each
+qualification facet and name unresolved gaps. `research` and `results` remain
+future workflows.
 The [opportunity schema](references/opportunities.schema.json) and
 `scripts/validate_opportunities.py` validate snapshots; live discovery uses
 Codex's available web tools, not a Python search backend.
