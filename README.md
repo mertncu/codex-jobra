@@ -1,3 +1,5 @@
+![Jobra banner](assets/jobra-banner.png)
+
 # Jobra
 
 Jobra is a Codex-native skill for people who want
