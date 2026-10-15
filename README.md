@@ -5,7 +5,7 @@ to explore job opportunities using a human-reviewed candidate profile. It turns
 resume evidence and explicit search preferences into sourced opportunity
 records, explainable matching assessments, and private reviewable results.
 
-**Status: early development (`0.0.1`).** Candidate profile drafting and review,
+**Status: early development (`0.1.0-alpha.1`).** Candidate profile drafting and review,
 live opportunity discovery, evidence-based matching, and saved results are
 implemented. Semantic matching quality has not been independently established;
 results need human review.
@@ -71,8 +71,9 @@ python3 -m venv .venv
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-The Python minimum version is not declared yet; the current test environment
-uses Python 3.9.6. For skill frontmatter validation, run OpenAI Skill Creator's
+The full test suite was validated locally on Python 3.9.6, and CI targets Python
+3.9. The minimum supported Python version has not been declared. For skill
+frontmatter validation, run OpenAI Skill Creator's
 `quick_validate.py skills/jobra` from the repository root. The [validation
 notes](docs/validation.md) record the latest installation and discovery status.
 
