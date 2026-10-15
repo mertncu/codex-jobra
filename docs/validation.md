@@ -1,110 +1,83 @@
-# Foundation validation
+# Packaging and validation status
 
-Validated on 2026-10-10 with Codex CLI `0.162.0-alpha.2`.
+This page separates local structure checks from installed runtime behavior.
+Manifest validity and an installed plugin entry do not prove that Codex loaded
+or invoked the skill.
 
-## Format and tooling
+## Package structure
 
-The [official packaging guide](https://developers.openai.com/plugins/build/plugins)
-supports a root portable `plugin.json` and automatic discovery of `skills/`.
-The manifest uses only `$schema`, `name`, `version`, and `description`.
-Plugin and skill names are both `jobra`.
+The repository uses a portable root `plugin.json` and `skills/jobra/SKILL.md`.
+The manifest and skill names are both `jobra`. The portable layout and manifest
+passed manual inspection and local JSON/frontmatter parsing. OpenAI's
+`skill-creator` `quick_validate.py skills/jobra` reported `Skill is valid!`.
+The OpenAI interface metadata points both the marketplace logo and composer
+icon to the bundled square asset at `assets/jobra-icon.png`.
+The published plugin JSON Schema was validated on 2026-10-10 using Codex CLI
+`0.162.0-alpha.2`; that external schema check has not been repeated in this
+installation task.
 
-The available OpenAI `skill-creator` skill provides `quick_validate.py`.
-The separate `plugin-creator` skill was not available in this environment;
-the documented manual portable layout was used instead. The installed
-`codex plugin --help` exposes no standalone package-validation command.
+The skill validator checks frontmatter, names, and scaffold markers. It does
+not test plugin installation, automatic discovery, or invocation. To repeat
+the local checks, use the `quick_validate.py` command in
+[the first-run guide](first-run.md) and run `git diff --check`.
 
-## Checks and results
+## Continuous integration
 
-| Check | Result |
-| --- | --- |
-| Manifest against published Agent Plugins 1.0.0 JSON Schema | PASS |
-| OpenAI skill-creator `quick_validate.py skills/jobra` | PASS: `Skill is valid!` |
-| Plugin and skill names, root layout, workflow scope, privacy boundaries | PASS: manual review |
-| Representative CV, profile, research, result, secret and Python paths ignored | PASS: `git check-ignore` |
-| Whitespace errors | PASS: `git diff --check` |
-| Desktop installation and fresh/existing-chat skill discovery | Not run |
+GitHub Actions runs on pull requests and pushes to `main` with read-only
+repository contents permission. It installs the bounded runtime requirements
+and the pinned PyYAML dependency needed by OpenAI Skill Creator's validator,
+runs the full deterministic test suite, validates the plugin and bundled JSON
+files, compiles the Python scripts, checks changed-file whitespace, and runs
+the official `quick_validate.py` from the pinned `openai/skills` revision
+`49f948faa9258a0c61caceaf225e179651397431`. CI does not access `.jobra/`, use
+Codex credentials, run live discovery, or evaluate model semantics. Local
+success does not establish that the workflow has passed on GitHub; that is only
+known after a push or pull request triggers Actions.
 
-Schema validation used the published
-[plugin schema](https://agent-plugins.org/schemas/1.0.0/plugin.schema.json),
-downloaded outside the repository. A temporary Python environment provided
-PyYAML 6.0.3 and jsonschema 4.25.1; these are validation dependencies, not plugin
-runtime dependencies.
+## CLI installation and discovery status
 
-## Reproduce
+On 2026-10-15, Codex CLI `0.162.1` installed Jobra from a local marketplace.
+`codex plugin list --json` showed `jobra@jobra-local` with `installed: true`
+and `enabled: true`. The installed package contained `plugin.json` and the
+`skills/jobra/` package. The installed `SKILL.md` was manually accessible and
+readable.
 
-Use a Python environment with PyYAML and jsonschema. Download the schema to a
-temporary location and validate from the repository root:
+**Automatic skill discovery and invocation are not conclusively verified.** A
+minimal `codex exec` attempt in the earlier isolated installation environment
+could not authenticate, so it did not produce a skill-recognition result. The
+normal authenticated CLI environment now has Jobra installed and enabled, but a
+fresh-session invocation has not yet been observed. Follow the
+[first-run guide](first-run.md) to start a fresh session and check the skill
+picker or explicit invocation. If Jobra is not available, report that outcome;
+do not simulate activation from repository files.
+
+**Codex Desktop installation, discovery, and invocation remain untested.** For
+a local marketplace in Desktop, the official plugin guide calls for restarting
+the app after adding a marketplace and testing the installed plugin in a new
+conversation. A successful CLI install does not establish Desktop behavior.
+
+The CLI commands used for local installation are:
 
 ```sh
-curl -fsSL https://agent-plugins.org/schemas/1.0.0/plugin.schema.json -o /tmp/jobra-plugin.schema.json
-python -c 'import json, jsonschema; jsonschema.validate(json.load(open("plugin.json")), json.load(open("/tmp/jobra-plugin.schema.json"))); print("Manifest valid")'
+codex plugin marketplace add "$JOBRA_MARKETPLACE"
+codex plugin add jobra@jobra-first-run
+codex plugin list --json
 ```
 
-Run `python /path/to/skill-creator/scripts/quick_validate.py skills/jobra`,
-substituting the actual installed OpenAI skill-creator path. That validator
-checks skill frontmatter, naming and unfinished scaffold markers; it is not
-a behavioral or full plugin-installation test.
+The marketplace directory and catalog format are created in
+[the first-run guide](first-run.md). The tested CLI installation used a local
+marketplace copy of `plugin.json` and `skills/`; the current README does not
+claim that other installation paths are verified.
 
-```sh
-git diff --check
-git check-ignore .jobra/cv.txt resumes/candidate.pdf profiles/candidate.json research/jobs.json results/report.md .env .env.production secrets/token.txt .venv/bin/python __pycache__/a.pyc
-```
+## Historical validation notes
 
-## Task 3.1 package and discovery check
+The initial foundation check on 2026-10-10 recorded the manifest schema,
+skill-validator, ignore-rule, and whitespace checks. A separate clean-workspace
+attempt at that time did not expose Jobra in the host marketplace listing; no
+global installation was performed then. The later V0.4 CLI installation above
+supersedes that old installation status, but not the still-unverified runtime
+discovery or Desktop status.
 
-After adding batch review, the portable manifest again passed the cached
-published Agent Plugins 1.0.0 JSON Schema, and OpenAI `skill-creator`'s
-`quick_validate.py skills/jobra` returned `Skill is valid!`. The root
-`plugin.json` and `skills/jobra/SKILL.md` match the current
-[official packaging guide](https://developers.openai.com/plugins/build/plugins):
-portable packages discover skills from root `skills/` without a manifest
-`skills` field. All profile workflow references and scripts are packaged under
-that directory. These checks establish package structure, not runtime discovery.
-
-A clean temporary Git workspace was populated with only `plugin.json`,
-`skills/`, and a repo-scoped `.agents/plugins/marketplace.json` pointing to the
-local copy. `codex plugin marketplace list` in that workspace showed only the
-host's globally configured marketplaces; `codex plugin list` did not show
-Jobra. The host did not expose an isolated install destination, so no plugin
-was installed into the user's global cache or settings. **Installation, skill
-discovery, and `$jobra` invocation remain unverified.** The earlier real-user
-test followed repository skill instructions directly; it did not prove
-installed-skill activation.
-
-## Manual installation acceptance
-
-The [official local marketplace procedure](https://developers.openai.com/plugins/build/plugins)
-and [complete-plugin test guidance](https://developers.openai.com/plugins/deploy/connect-chatgpt)
-require an installed plugin and a new conversation for behavioral verification:
-
-1. Create a clean local test Git workspace. Copy only this repository's
-   `plugin.json` and `skills/` to `plugins/jobra/` in that workspace. Do not copy
-   `.jobra/`, real CVs, or private operation files.
-2. Add the README's `jobra-dev` catalog at
-   `.agents/plugins/marketplace.json`, with source path `./plugins/jobra`.
-   Restart the desktop app, open the test workspace, choose `jobra-dev` in the
-   Plugins Directory, and install Jobra. Verify that the installed plugin lists
-   one `jobra` skill.
-3. Start a **new conversation** in that workspace. Select or invoke `$jobra`
-   with `setup` and a synthetic local TXT resume. Confirm that it asks for the
-   resume path and access approval, saves an unverified draft under ignored
-   `.jobra/`, and never transmits the file to a job platform.
-4. Invoke `$jobra profile` on that draft. Confirm that it shows evidence and
-   review states, supports a multi-decision batch yielding one snapshot, and
-   leaves the profile draft until a **separate** explicit final approval.
-   Confirm that `research` reports its current unimplemented status rather than
-   running job discovery.
-5. Repeat the `setup` and `profile` checks in an existing conversation after
-   installation. Record the desktop/CLI version, marketplace visibility,
-   installed plugin and skill visibility, invocation result, and any errors.
-   Claim discovery only after observing it in the skill picker or invocation.
-
-No user settings were modified during this Task 3.1 check. If a supported host
-cannot load the portable package, investigate that exact failure before adding
-a compatibility manifest.
-
-Older clients and public-directory submission are not validated. A compatibility
-overlay should be added only if a supported host actually requires it. Public
-release also needs a license; structural validation does not establish
-public-directory acceptance.
+For the manifest schema check, the earlier procedure downloaded the published
+schema and validated `plugin.json` with `jsonschema`. Network access and the
+external schema itself are not required by Jobra's runtime scripts.

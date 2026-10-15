@@ -1,107 +1,97 @@
 # Jobra
 
-CV-aware job opportunity research, built as a Codex-native, skill-only plugin.
-Jobra aims to turn a user-verified candidate profile into evidence-based,
-explainable opportunity recommendations. Users review opportunities and apply
-themselves; Jobra must never automatically submit applications.
+Jobra is a Codex-native skill for people who want
+to explore job opportunities using a human-reviewed candidate profile. It turns
+resume evidence and explicit search preferences into sourced opportunity
+records, explainable matching assessments, and private reviewable results.
 
-**Status: early development (`0.0.1`).** Local resume extraction, candidate
-drafts, batched human profile review, and an agent-driven discovery workflow
-are available. Discovery requires approved preferences and live Codex web tools;
-candidate matching is not implemented.
+**Status: early development (`0.0.1`).** Candidate profile drafting and review,
+live opportunity discovery, evidence-based matching, and saved results are
+implemented. Semantic matching quality has not been independently established;
+results need human review.
 
-## Design
+## What Jobra supports
 
-- Use Codex's existing reasoning and tools; no standalone backend, web server,
-  mandatory external LLM API keys, agent framework, database, or MCP server.
-- Store candidate data locally, with human review before a draft is verified.
-- Support claims with resume evidence; distinguish inference and missing data.
-- Add small, testable Python utilities only when a workflow needs them.
+- Extract text locally from PDF, DOCX, Markdown, and UTF-8 TXT resumes, then use
+  Codex to draft an evidence-linked profile. Scanned PDFs and OCR are unsupported.
+- Review, correct, confirm, or reject profile claims and verify a profile only
+  after all sections and a separate final approval.
+- Keep search preferences separate from the candidate profile; preferences must
+  come from the user, not be inferred from a resume.
+- Research real postings with Codex web tools after the user approves the
+  search scope. Preserve source URLs, evidence, freshness, duplicates, and
+  uncertainty in local snapshots.
+- Compare a verified profile with validated opportunities using Codex for
+  semantic interpretation and Python for deterministic validation, constraints,
+  aggregation, and private result files.
 
-## Install for local development
+Jobra does not provide a standalone backend, web server, database, mandatory
+external LLM API, job-matching accuracy guarantee, or automatic applications.
+It does not support a separate `research` workflow; use `discover` for supported
+live opportunity research. A reachable posting is not proof the vacancy remains
+open, and an unmentioned qualification is not proof the candidate lacks it.
 
-This repository is the plugin root. It follows the current
-[official portable plugin format](https://developers.openai.com/plugins/build/plugins):
-root `plugin.json` and `skills/jobra/SKILL.md`, without a compatibility overlay.
+## How it works and privacy
 
-For a local test, use the documented repo marketplace flow in a separate test
-workspace. Copy only `plugin.json` and `skills/` into `plugins/jobra/` there.
-Add this catalog at `.agents/plugins/marketplace.json` in that workspace
-(merge the entry if a catalog already exists):
+Jobra is a skill-first plugin. Codex handles conversation and semantic
+interpretation; bundled Python scripts handle local text extraction, schema and
+provenance checks, bounded planning, safe persistence, aggregation, and
+rendering. Python does not scrape job sites or call an LLM API.
 
-```json
-{
-  "name": "jobra-dev",
-  "plugins": [
-    {
-      "name": "jobra",
-      "source": { "source": "local", "path": "./plugins/jobra" },
-      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
-      "category": "Productivity"
-    }
-  ]
-}
+Runtime candidate data, preferences, opportunity snapshots, and results belong
+in the selected workspace's ignored `.jobra/` directory, not in the plugin
+package. Local storage does not mean Codex inference is offline; content given
+to Codex is processed under the user's Codex account and service settings.
+Before reading a personal resume or sending search terms externally, Jobra must
+obtain the user's explicit approval for the source/data, destination, and
+purpose. Users review recommendations and submit applications themselves.
+
+## Install with Codex CLI
+
+This procedure uses the local marketplace mechanism verified with Codex CLI
+`0.162.1`. It copies only the plugin manifest and skill package to a persistent
+local marketplace. It does not install Python dependencies. Automatic `$jobra`
+skill discovery has not been conclusively verified; Desktop compatibility is
+untested. Follow the [first-run guide](docs/first-run.md) for prerequisites,
+commands, setup, and the verification boundaries.
+
+The installed `SKILL.md` was manually confirmed accessible. That does not prove
+automatic skill discovery or invocation. Start a fresh Codex session after
+installation and check whether Jobra appears in the skill picker before relying
+on it. Do not treat the repository's instructions as proof that an installed
+skill was activated.
+
+## Development and validation
+
+Use Python 3 and the bundled runtime dependencies:
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -r skills/jobra/requirements.txt
+.venv/bin/python -m unittest discover -s tests -v
 ```
 
-Restart the desktop app, open that workspace, select `jobra-dev` in the Plugins
-Directory, and install Jobra. Select its `jobra` skill and supply `setup`,
-`profile`, `discover`, `research`, or `results` as task text. These are intended skill
-arguments, not shell commands or separate skills. `setup` creates an unverified
-draft, and `profile` guides human verification. `research` and `results` remain
-planned.
+The Python minimum version is not declared yet; the current test environment
+uses Python 3.9.6. For skill frontmatter validation, run OpenAI Skill Creator's
+`quick_validate.py skills/jobra` from the repository root. The [validation
+notes](docs/validation.md) record the latest installation and discovery status.
 
-Marketplace availability varies by host. The package and skill structure pass
-local validation, but installation, fresh-chat skill discovery, and skill
-invocation remain unverified on this host. Follow the
-[manual installation acceptance test](docs/validation.md#manual-installation-acceptance)
-before claiming the installed plugin works. Older hosts may need a compatibility
-manifest; add one only after observing a specific failure.
+## Limitations
 
-## Privacy and development
+- Matching explanations are Codex assessments, not independently validated
+  predictions or calibrated hiring probabilities.
+- Source pages may be inaccessible, stale, or ambiguous; application status can
+  remain unknown. Remote listings do not establish work eligibility from a
+  particular country.
+- Plugin installation was verified through the Codex CLI local marketplace.
+  Automatic skill discovery is inconclusive, and Desktop installation has not
+  been tested.
 
-Use `.jobra/` in the working project for private ingestion output and profiles;
-the local scripts create it when needed. Never put personal data in the
-plugin package, examples, or test fixtures. Use synthetic fixtures when tests
-are introduced. `.gitignore` is an accident guard, not access control, and cannot
-protect already tracked files.
+## License
 
-Before collecting or reading a CV, obtain explicit approval for the source and
-purpose. Before sending CV or profile data to an external service (including a
-search query), obtain approval for the data, destination, and purpose. Local
-storage does not imply offline inference: content supplied to Codex is processed
-under the user's Codex configuration and service settings.
+Jobra is distributed under the MIT License. See [LICENSE](LICENSE).
 
-See [validation notes](docs/validation.md). Future utilities belong in
-`skills/jobra/scripts/`, workflow references in `skills/jobra/references/`, tests
-in `tests/`, and synthetic examples in `examples/`; create those directories
-when they contain useful material. The [candidate data contract](docs/candidate-data-contract.md)
-defines profile and preference documents. [Resume ingestion](docs/resume-ingestion.md)
-documents the local extraction and draft workflow.
-
-See [profile review](docs/profile-review.md) for batch operations, atomicity,
-privacy, and verified-profile immutability. The project is intended for
-open-source release. A license must be selected and added before release; this
-version does not declare one.
-
-Candidate Intelligence evaluation is available as a small, synthetic golden
-dataset and deterministic scorer. See [the evaluation workflow](evaluation/README.md)
-and its [example report](evaluation/example-report.md). No Codex extraction
-accuracy is claimed until independently generated predictions are evaluated.
-
-Explainable matching also has a synthetic benchmark and deterministic
-evaluation runner. See [matching evaluation methodology](evaluation/matching/README.md)
-and its [machine-readable](evaluation/matching/example-report.v1.json) and
-[human-readable](evaluation/matching/example-report.v1.md) example reports.
-The included Task 5 semantic run was unblinded within one Codex context and is
-not an independent agent-accuracy result. The frozen [V0.2.1 challenge and
-blind-run procedure](evaluation/matching/challenge_v2/README.md) uses a
-separate projectless Codex task and preserves the V1 baseline. Its [blind
-results](evaluation/matching/challenge_v2/report.v2.md) and [failure
-register](evaluation/matching/challenge_v2/failure-register.v2.md) are available.
-
-The [opportunity data contract](docs/opportunity-data-contract.md) supports
-validation and atomic local snapshots of sourced job listings. The
-[discover workflow](docs/opportunity-discovery.md) uses Codex web tools with
-approved preferences. Evidence-grounded matching uses a local interpretation
-packet and creates private, immutable results; see
-[the matching workflow](docs/opportunity-matching.md).
+See the [candidate and search-preference contract](docs/candidate-data-contract.md),
+[resume ingestion guide](docs/resume-ingestion.md), [opportunity discovery
+guide](docs/opportunity-discovery.md), [matching workflow](docs/opportunity-matching.md),
+and [profile review guide](docs/profile-review.md) for details.

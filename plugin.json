@@ -2,5 +2,17 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "jobra",
   "version": "0.0.1",
-  "description": "CV-aware candidate profile drafting and human verification for Codex; opportunity research is planned."
+  "description": "CV-aware candidate profile drafting and human verification for Codex; opportunity research is planned.",
+  "license": "MIT",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Jobra",
+        "shortDescription": "CV-aware job research",
+        "longDescription": "Build and review an evidence-backed candidate profile, research sourced job postings, and inspect explainable candidate–opportunity assessments. Matching quality has not been independently established. Jobra never submits applications.",
+        "composerIcon": "./assets/jobra-icon.png",
+        "logo": "./assets/jobra-icon.png"
+      }
+    }
+  }
 }
