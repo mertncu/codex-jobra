@@ -1,7 +1,5 @@
 ![Jobra banner](assets/jobra-banner.png)
 
-# Jobra
-
 Jobra is a Codex-native skill for people who want
 to explore job opportunities using a human-reviewed candidate profile. It turns
 resume evidence and explicit search preferences into sourced opportunity
