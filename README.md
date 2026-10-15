@@ -35,6 +35,8 @@ open, and an unmentioned qualification is not proof the candidate lacks it.
 
 ## How it works and privacy
 
+![How Jobra works](assets/how-it-works.png)
+
 Jobra is a skill-first plugin. Codex handles conversation and semantic
 interpretation; bundled Python scripts handle local text extraction, schema and
 provenance checks, bounded planning, safe persistence, aggregation, and
