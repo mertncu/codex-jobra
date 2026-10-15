@@ -545,6 +545,16 @@ def render_match_results_markdown(document, opportunity_document):
                       f"- Workflow status: **{_md_text(status)}**",
                       f"- Original posting: <{_markdown_url(opportunity.get('original_url') or result.get('original_url') or '')}>",
                       f"- Source observed: {_md_text(opportunity.get('last_observed_at') or 'Unknown')}"])
+        discovery_origin = result.get("discovery_origin")
+        if isinstance(discovery_origin, dict):
+            lines.append(f"- Discovery origin: **{_md_text(discovery_origin.get('classification', 'unknown'))}**")
+            audit_status = discovery_origin.get("discovery_audit_status")
+            if audit_status:
+                lines.append(f"- Discovery audit status: {_md_text(audit_status)}")
+            if discovery_origin.get("possible_duplicate_requires_review"):
+                lines.append("- Duplicate review: **possible duplicate; identity is unresolved**")
+            if not discovery_origin.get("assessment_selected", False) and status == "assessment_not_completed":
+                lines.append("- Assessment scope: not selected within this run's assessment limit")
         app = claims.get("status", {})
         app_value = app.get("value") if app.get("origin") == "observed" else None
         app_display = (f"{app_value} as recorded at last observation; not a current guarantee"

@@ -33,6 +33,11 @@ workflow for the exact catalog and repair procedure, and apply its
 requirement. A matching rationale must explain how evidence supports each
 qualification facet and name unresolved gaps. `research` remains a future
 workflow. For `results`, follow [the saved results workflow](references/results-workflow.md): locate the verified profile, separate search preferences, and saved opportunity snapshot; prepare a fresh local reference catalog; make Codex's evidence-linked assessment; then validate, aggregate, and render a private shortlist. The user should not need to manage catalog, assessment, or snapshot files.
+When continuing an integrated discovery run into results, follow the
+[discovery-to-results workflow](references/discovery-to-results.md). It reuses
+the run manifest, accepted opportunity snapshot, and discovery audit; partial
+discovery can continue when usable records exist. Exclusions, possible
+duplicates, unassessed opportunities, and invalid assessments remain visible.
 The [opportunity schema](references/opportunities.schema.json) and
 `scripts/validate_opportunities.py` validate snapshots; live discovery uses
 Codex's available web tools, not a Python search backend.
@@ -47,7 +52,7 @@ Treat these as task text supplied to this one skill, not executable commands:
 | `profile` | Review evidence and candidate records, explicitly confirm each section, and request final approval before verification. Search preferences remain a separate document. |
 | `discover` | Inspect real job postings using a verified profile and separately approved search preferences; validate and save evidence-backed opportunity snapshots. |
 | `match` | Explain candidate evidence against validated job requirements, keep user constraints separate, and save a local result snapshot. |
-| `research` | Research relevant opportunities using the verified profile and approved criteria; retain source links and retrieval dates. |
+| `research` | Not implemented as a separate workflow. Use `discover` for supported live opportunity research. |
 | `results` | Review saved match results and opportunity sources; explain candidate fit, career alignment, gaps, freshness, and uncertainty. |
 
 Natural-language requests such as “Jobra, review my saved job opportunities against my verified profile and show me the results” invoke `results`. By default, assess all opportunities in the one selected valid saved opportunity snapshot. The user may request a subset by title, employer, or opportunity ID. If multiple verified profiles, preference documents, or opportunity snapshots make the source choice ambiguous, ask which to use before preparing a catalog. Never use historical matching assessments as current input.

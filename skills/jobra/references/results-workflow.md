@@ -2,6 +2,12 @@
 
 Use this workflow when a user asks Jobra to review saved opportunities against their verified profile, including natural-language requests such as “show me my saved job results.” Do not start web research. This flow uses the local profile, separate search preferences, and saved opportunity evidence only.
 
+If the user is continuing a specific discovery run and its manifest contains a
+validated opportunity snapshot and audit, use the integrated
+[discovery-to-results workflow](discovery-to-results.md). That workflow keeps
+new observations, previously saved listings, and discovery exclusions tied to
+the same run.
+
 ## Select local inputs
 
 1. Locate valid verified candidate profiles under `.jobra/profiles/`, search preferences under `.jobra/discovery/`, and opportunity snapshots under `.jobra/opportunities/`. Do not inspect historical assessment files to construct a new run. Do not print profile content while locating files.

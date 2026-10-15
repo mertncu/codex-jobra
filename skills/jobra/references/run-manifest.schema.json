@@ -59,7 +59,7 @@
         "matching_catalog": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]},
         "assessment": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]},
         "result_snapshot": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]},
-        "result_report": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]}
+        "result_report": {"oneOf": [{"$ref": "#/$defs/report_reference"}, {"type": "null"}]}
       }
     }
   },
@@ -69,6 +69,14 @@
       "required": ["path", "sha256"],
       "properties": {
         "path": {"type": "string", "pattern": "^\\.jobra/[a-z-]+/[A-Za-z0-9._-]+\\.json$"},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "report_reference": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^\\.jobra/matches/[A-Za-z0-9._-]+\\.md$"},
         "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
       }
     },
