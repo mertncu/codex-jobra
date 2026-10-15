@@ -167,7 +167,8 @@ def _new_manifest(limits):
         "limits": dict(limits),
         "stages": {name: {"status": "pending", "attempts": 0,
                           "error_codes": [], "incomplete_reasons": []} for name in STAGES},
-        "artifacts": {"discovery_query_plan": None, "opportunity_snapshot": None,
+        "artifacts": {"discovery_query_plan": None, "discovery_observations": None,
+                      "discovery_audit": None, "opportunity_snapshot": None,
                       "matching_catalog": None, "assessment": None,
                       "result_snapshot": None, "result_report": None},
     }

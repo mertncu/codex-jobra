@@ -53,6 +53,8 @@
       "required": ["discovery_query_plan", "opportunity_snapshot", "matching_catalog", "assessment", "result_snapshot", "result_report"],
       "properties": {
         "discovery_query_plan": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]},
+        "discovery_observations": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]},
+        "discovery_audit": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]},
         "opportunity_snapshot": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]},
         "matching_catalog": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]},
         "assessment": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]},

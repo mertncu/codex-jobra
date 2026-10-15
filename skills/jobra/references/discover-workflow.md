@@ -53,11 +53,17 @@
    is unknown. Even reachable pages require explicit application-status
    evidence. `append_observation` creates a new in-memory record; persist it as
    a new immutable snapshot, never overwrite the previous one. Run
-   `validate_opportunities` per proposed record. Record invalid/inaccessible
-   leads separately with fixed failure categories in `.jobra/discovery/`.
-   Validate the final bundle and call `save_opportunities.py` for a new atomic
-   snapshot. No profile or preferences are changed. Retain uncertainty and old
-   snapshots; do not discard failures from the pilot report.
+   `validate_opportunities` per proposed record. Record actual queries, source
+   outcomes, valid records, invalid records, inaccessible sources and explicit
+   rejections in the input contract described in
+   [discovery integration](discovery-integration.md). Then run
+   `integrate_discovery.py` with the prepared manifest and local observation
+   JSON. It validates records independently, reuses conservative
+   deduplication/freshness helpers, and writes a private audit plus a new
+   snapshot when at least one valid opportunity exists. Possible duplicates
+   stay separate and flagged for review. No profile or preferences are changed.
+   Retain uncertainty and old snapshots; do not discard failures from the pilot
+   report.
 7. Report preferences, actual executed queries/tools, distinct leads found,
    original pages inspected, valid saved records, rejected/inaccessible counts,
    source coverage, unknown fields, validation results and limitations. Link

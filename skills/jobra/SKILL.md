@@ -16,6 +16,10 @@ For `discover`, read [the discovery workflow](references/discover-workflow.md).
 The offline deterministic input and query-budget preparation entry point is
 documented in [pipeline preparation](references/pipeline-preparation.md); it
 does not itself run live discovery or matching.
+After Codex has researched approved queries, pass its structured observations
+through the deterministic [discovery integration](references/discovery-integration.md)
+entry point for per-record validation, audit, conservative deduplication, and
+immutable private persistence.
 For matching, read [the matching workflow](../../docs/opportunity-matching.md).
 Matching accepts only a verified profile, separate preferences, validated
 opportunities, a deterministic local reference catalog, and evidence-linked

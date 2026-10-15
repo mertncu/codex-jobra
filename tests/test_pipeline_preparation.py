@@ -196,6 +196,12 @@ class PipelinePreparationTests(unittest.TestCase):
         invalid["run_status"] = "completed"
         self.assertEqual(["run_status_inconsistent"], pipeline.validate_manifest(invalid))
 
+    def test_manifest_v1_without_discovery_integration_artifacts_remains_valid(self):
+        manifest, _ = pipeline.prepare_run(self.workspace)
+        manifest["artifacts"].pop("discovery_observations")
+        manifest["artifacts"].pop("discovery_audit")
+        self.assertEqual([], pipeline.validate_manifest(manifest))
+
     def test_stage_transitions_record_interruption_and_enforce_retry_budget(self):
         manifest, path = pipeline.prepare_run(self.workspace)
         started = pipeline.transition_stage(manifest, "live_discovery", "running")
