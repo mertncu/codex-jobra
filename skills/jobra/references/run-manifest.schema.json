@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://jobra.local/schemas/run-manifest.v1.json",
+  "title": "Jobra private pipeline run manifest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_version", "run_id", "revision", "created_at", "updated_at", "run_status", "previous_manifest_reference", "inputs", "limits", "stages", "artifacts"],
+  "properties": {
+    "manifest_version": {"const": "1"},
+    "run_id": {"type": "string", "pattern": "^run_[a-f0-9]{32}$"},
+    "revision": {"type": "integer", "minimum": 1},
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"},
+    "run_status": {"enum": ["preparing", "prepared", "running", "partial", "failed", "completed"]},
+    "previous_manifest_reference": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]},
+    "inputs": {
+      "type": "object", "additionalProperties": false,
+      "required": ["candidate_profile", "search_preferences", "selected_opportunity_snapshot"],
+      "properties": {
+        "candidate_profile": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]},
+        "search_preferences": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]},
+        "selected_opportunity_snapshot": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]}
+      }
+    },
+    "limits": {
+      "type": "object", "additionalProperties": false,
+      "required": ["max_discovery_queries", "max_opportunities_to_discover", "max_opportunities_to_assess", "max_retries"],
+      "properties": {
+        "max_discovery_queries": {"type": "integer", "minimum": 1, "maximum": 100},
+        "max_opportunities_to_discover": {"type": "integer", "minimum": 1, "maximum": 100},
+        "max_opportunities_to_assess": {"type": "integer", "minimum": 1, "maximum": 100},
+        "max_retries": {"type": "integer", "minimum": 0, "maximum": 5}
+      }
+    },
+    "stages": {
+      "type": "object", "additionalProperties": false,
+      "required": ["candidate_profile_validation", "search_preferences_validation", "opportunity_snapshot_selection", "discovery_plan_preparation", "live_discovery", "opportunity_validation_and_persistence", "deduplication_and_freshness", "matching_catalog_preparation", "semantic_assessment", "aggregation_and_results"],
+      "properties": {
+        "candidate_profile_validation": {"$ref": "#/$defs/stage"},
+        "search_preferences_validation": {"$ref": "#/$defs/stage"},
+        "opportunity_snapshot_selection": {"$ref": "#/$defs/stage"},
+        "discovery_plan_preparation": {"$ref": "#/$defs/stage"},
+        "live_discovery": {"$ref": "#/$defs/stage"},
+        "opportunity_validation_and_persistence": {"$ref": "#/$defs/stage"},
+        "deduplication_and_freshness": {"$ref": "#/$defs/stage"},
+        "matching_catalog_preparation": {"$ref": "#/$defs/stage"},
+        "semantic_assessment": {"$ref": "#/$defs/stage"},
+        "aggregation_and_results": {"$ref": "#/$defs/stage"}
+      }
+    },
+    "artifacts": {
+      "type": "object", "additionalProperties": false,
+      "required": ["discovery_query_plan", "opportunity_snapshot", "matching_catalog", "assessment", "result_snapshot", "result_report"],
+      "properties": {
+        "discovery_query_plan": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]},
+        "opportunity_snapshot": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]},
+        "matching_catalog": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]},
+        "assessment": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]},
+        "result_snapshot": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]},
+        "result_report": {"oneOf": [{"$ref": "#/$defs/file_reference"}, {"type": "null"}]}
+      }
+    }
+  },
+  "$defs": {
+    "file_reference": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^\\.jobra/[a-z-]+/[A-Za-z0-9._-]+\\.json$"},
+        "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      }
+    },
+    "stage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "attempts", "error_codes", "incomplete_reasons"],
+      "properties": {
+        "status": {"enum": ["pending", "running", "completed", "partial", "failed", "skipped"]},
+        "attempts": {"type": "integer", "minimum": 0, "maximum": 6},
+        "error_codes": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]{1,63}$"}},
+        "incomplete_reasons": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]{1,63}$"}}
+      }
+    }
+  }
+}

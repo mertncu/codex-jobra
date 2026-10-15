@@ -13,6 +13,9 @@ the data contract. `setup` creates an unverified draft from an approved local
 resume; read [the setup workflow](references/setup-workflow.md). `profile`
 reviews a saved draft; read [the profile workflow](references/profile-workflow.md).
 For `discover`, read [the discovery workflow](references/discover-workflow.md).
+The offline deterministic input and query-budget preparation entry point is
+documented in [pipeline preparation](references/pipeline-preparation.md); it
+does not itself run live discovery or matching.
 For matching, read [the matching workflow](../../docs/opportunity-matching.md).
 Matching accepts only a verified profile, separate preferences, validated
 opportunities, a deterministic local reference catalog, and evidence-linked
