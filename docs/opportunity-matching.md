@@ -17,6 +17,10 @@ candidate evidence, posting evidence, requirement slots, or preference refs.
      .jobra/opportunities/<snapshot>.json --workspace .
    ```
 
+   Add `--opportunity-id <id>` once per selected opportunity to prepare a
+   subset. The command reports deterministic explicit-role exclusions so Codex
+   can avoid producing a semantic assessment for those opportunities.
+
    The catalog is a mode-0600 immutable file under ignored `.jobra/matches/`.
    It contains accepted candidate records and evidence with their original
    document/location provenance, opportunity evidence and source IDs, exact
@@ -79,6 +83,16 @@ candidate evidence, posting evidence, requirement slots, or preference refs.
    semantic classifications, or invents replacement evidence. If semantics
    remain invalid, the result says so while retaining independently computed
    hard-filter and location/work-mode outcomes for every valid source posting.
+
+   Pass the same repeated `--opportunity-id <id>` flags to preparation and
+   aggregation. The aggregator creates an immutable private JSON audit
+   snapshot and a readable Markdown shortlist under `.jobra/matches/`. Each
+   selected opportunity has a workflow state: `successfully_assessed`,
+   `assessment_failed_validation`, `assessment_not_completed`, or
+   `excluded_by_explicit_user_constraint`. Missing assessments remain visible
+   and are never converted to negative matches. Raw submitted attempts and
+   fixed validation diagnostics are retained only in the ignored local audit
+   snapshot.
 
 ## Evidence and trust boundaries
 

@@ -81,3 +81,42 @@ def write_private_json_atomic(workspace: Path, category: str, filename: str, dat
         if temporary is not None:
             temporary.unlink(missing_ok=True)
     return target
+
+
+def write_private_text_atomic(workspace: Path, category: str, filename: str, text: str) -> Path:
+    """Publish a complete private Markdown artifact without replacing a prior file."""
+    if category != "matches" or not filename.endswith(".md") or "/" in filename or ".." in filename:
+        raise StorageError("invalid_destination")
+    root = Path(workspace)
+    if not root.is_dir():
+        raise StorageError("invalid_workspace")
+    private = root / ".jobra"
+    directory = private / category
+    for part in (private, directory):
+        if part.is_symlink():
+            raise StorageError("unsafe_destination")
+        try:
+            part.mkdir(mode=0o700, exist_ok=True)
+        except OSError:
+            raise StorageError("unwritable_destination") from None
+        if not part.is_dir():
+            raise StorageError("unsafe_destination")
+    target = directory / filename
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=directory,
+                                         prefix=".pending-", suffix=".md", delete=False) as stream:
+            temporary = Path(stream.name)
+            os.chmod(temporary, 0o600)
+            stream.write(text)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.link(temporary, target)
+    except FileExistsError:
+        raise StorageError("output_exists") from None
+    except OSError:
+        raise StorageError("unwritable_destination") from None
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+    return target

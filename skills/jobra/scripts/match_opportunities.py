@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
+from html import escape as html_escape
 import json
 from pathlib import Path
 import re
@@ -11,13 +12,38 @@ import unicodedata
 from uuid import uuid4
 
 from jsonschema import Draft202012Validator, FormatChecker
-from local_storage import StorageError, write_private_json_atomic
+from local_storage import (StorageError, write_private_json_atomic,
+                           write_private_text_atomic)
 from validate_opportunities import validate_opportunities
 from validate_profile import ACCEPTED, SECTIONS, records_for_downstream, validate_document
 
 
 class MatchError(ValueError):
     """Fixed privacy-safe matching validation error."""
+
+
+WORKFLOW_STATES = frozenset(("successfully_assessed", "assessment_failed_validation",
+                             "assessment_not_completed", "excluded_by_explicit_user_constraint"))
+
+
+def select_opportunity_document(opportunity_document, selected_ids=None):
+    """Return a read-only subset of one opportunity snapshot, or the full document."""
+    if selected_ids is None:
+        return opportunity_document
+    if (not isinstance(selected_ids, (list, tuple)) or not selected_ids or
+            any(not isinstance(item, str) or not item for item in selected_ids) or
+            len(set(selected_ids)) != len(selected_ids)):
+        raise MatchError("selected_opportunity_ids_invalid")
+    if not isinstance(opportunity_document, dict) or not isinstance(
+            opportunity_document.get("opportunities"), list):
+        raise MatchError("opportunities_invalid")
+    wanted = set(selected_ids)
+    selected = [item for item in opportunity_document["opportunities"]
+                if isinstance(item, dict) and item.get("id") in wanted]
+    found = {item.get("id") for item in selected}
+    if found != wanted:
+        raise MatchError("selected_opportunity_not_found")
+    return {**opportunity_document, "opportunities": selected}
 
 
 def _norm(value):
@@ -35,6 +61,8 @@ def validate_matching_sources(profile, preferences, opportunity_document):
     """Validate immutable source inputs, independently of Codex interpretation."""
     if validate_document(profile, "candidate_profile") or profile.get("verification_status") != "verified":
         raise MatchError("candidate_profile_must_be_verified_and_valid")
+    if preferences is None:
+        raise MatchError("search_preferences_missing")
     if validate_document(preferences, "search_preferences"):
         raise MatchError("search_preferences_invalid")
     if validate_opportunities(opportunity_document):
@@ -49,8 +77,9 @@ def validate_matching_sources(profile, preferences, opportunity_document):
     return opportunities, candidate_records, candidate_evidence
 
 
-def build_reference_catalog(profile, preferences, opportunity_document):
+def build_reference_catalog(profile, preferences, opportunity_document, selected_ids=None):
     """Return valid semantic references and their local provenance for Codex."""
+    opportunity_document = select_opportunity_document(opportunity_document, selected_ids)
     opportunities, candidate_records, candidate_evidence = validate_matching_sources(
         profile, preferences, opportunity_document)
     records_by_evidence = {identifier: [] for identifier in candidate_evidence}
@@ -269,6 +298,14 @@ def _excluded_by_preference(opportunity, preferences):
     return [term for term in preferences["excluded_roles"] if _has_phrase(text, term)]
 
 
+def explicit_exclusion_decisions(opportunity_document, preferences):
+    """Return deterministic exclusions for selected opportunities only."""
+    return [{"opportunity_id": item["id"],
+             "excluded_roles": _excluded_by_preference(item, preferences)}
+            for item in opportunity_document["opportunities"]
+            if _excluded_by_preference(item, preferences)]
+
+
 def build_match_results(profile, preferences, opportunity_document, interpretation, evaluated_at=None):
     opportunities = validate_matching_inputs(profile, preferences, opportunity_document, interpretation)
     evaluated_at = evaluated_at or datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
@@ -354,13 +391,14 @@ def _attempt_assessments(document):
 
 def build_match_results_resilient(profile, preferences, opportunity_document,
                                   interpretation, repair_interpretation=None,
-                                  evaluated_at=None):
+                                  evaluated_at=None, selected_ids=None):
     """Compute hard constraints for every valid source even if semantics fail.
 
     A single repair document is supported. Raw attempts and fixed diagnostics are
     retained in the local snapshot for audit; failed semantics are never repaired
     by Python or replaced with guessed references.
     """
+    opportunity_document = select_opportunity_document(opportunity_document, selected_ids)
     opportunities, candidate_records, candidate_evidence = validate_matching_sources(
         profile, preferences, opportunity_document)
     if repair_interpretation is not None and not isinstance(repair_interpretation, dict):
@@ -371,6 +409,20 @@ def build_match_results_resilient(profile, preferences, opportunity_document,
     attempt_maps = [_attempt_assessments(item) for item in attempts]
     evaluated_at = evaluated_at or datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
     results = []
+    unassigned_assessments = []
+    for index, (assessment_map, root_errors) in enumerate(attempt_maps, 1):
+        for identifier, assessment in assessment_map.items():
+            if identifier not in opportunities:
+                unassigned_assessments.append({"attempt": index,
+                    "kind": "initial" if index == 1 else "single_bounded_repair",
+                    "assessment": assessment,
+                    "diagnostics": [{"path": "opportunity_id",
+                                     "code": "unknown_opportunity_reference"}]})
+        for error in root_errors:
+            if error.get("code") == "duplicate_assessment_opportunity":
+                unassigned_assessments.append({"attempt": index,
+                    "kind": "initial" if index == 1 else "single_bounded_repair",
+                    "assessment": None, "diagnostics": [error]})
     for opportunity in opportunity_document["opportunities"]:
         opportunity_id = opportunity["id"]
         excluded = _excluded_by_preference(opportunity, preferences)
@@ -378,8 +430,10 @@ def build_match_results_resilient(profile, preferences, opportunity_document,
         attempt_history = []
         chosen = None
         errors = []
+        supplied = False
         for index, (assessment_map, root_errors) in enumerate(attempt_maps, 1):
             assessment = assessment_map.get(opportunity_id)
+            supplied = supplied or assessment is not None
             if assessment is None:
                 attempt_errors = root_errors or [{"path": "assessments", "code": "assessment_missing"}]
             else:
@@ -393,17 +447,30 @@ def build_match_results_resilient(profile, preferences, opportunity_document,
                 chosen = assessment
                 break
             errors = attempt_errors
+        if excluded:
+            workflow_status = "excluded_by_explicit_user_constraint"
+        elif chosen is not None:
+            workflow_status = "successfully_assessed"
+        elif supplied or any(root_errors for _, root_errors in attempt_maps):
+            workflow_status = "assessment_failed_validation"
+        else:
+            workflow_status = "assessment_not_completed"
         if chosen is None:
+            semantic_status = "invalid" if supplied or any(
+                root_errors for _, root_errors in attempt_maps) else "not_completed"
             results.append({"opportunity_id": opportunity_id,
+                "workflow_status": workflow_status,
                 "original_url": opportunity["original_url"],
-                "semantic_assessment": {"status": "invalid", "diagnostics": errors},
+                "semantic_assessment": {"status": semantic_status, "diagnostics": errors},
                 "candidate_fit": None, "experience_alignment": None,
                 "career_alignment": None,
                 "hard_filter": {"status": "computed", "excluded_roles": excluded,
                                 "location_work_mode": dimensions},
                 "hard_filter_violations": excluded,
                 "recommendation": "excluded_by_explicit_user_constraint" if excluded else "assessment_unavailable",
-                "warnings": ["semantic_assessment_invalid", "hard_filter_evaluated_independently"],
+                "warnings": ["semantic_assessment_invalid" if semantic_status == "invalid"
+                             else "semantic_assessment_not_completed",
+                             "hard_filter_evaluated_independently"],
                 "repair_history": attempt_history})
             continue
         one_document = {"schema_version": "1", "opportunities": [opportunity]}
@@ -411,17 +478,135 @@ def build_match_results_resilient(profile, preferences, opportunity_document,
         aggregated = build_match_results(profile, preferences, one_document,
                                          one_interpretation, evaluated_at=evaluated_at)["results"][0]
         aggregated["semantic_assessment"] = {"status": "aggregated", "diagnostics": []}
+        aggregated["workflow_status"] = workflow_status
         aggregated["hard_filter"] = {"status": "computed", "excluded_roles": excluded,
                                      "location_work_mode": dimensions}
         aggregated["repair_history"] = attempt_history
         results.append(aggregated)
-    return {"schema_version": "2",
+    result_document = {"schema_version": "2",
             "evaluation_method": "Codex semantic interpretation; deterministic catalog, validation, hard filters, and aggregation",
-            "results": results}
+            "results": results,
+            "unassigned_assessments": unassigned_assessments}
+    # Keep raw attempts locally so even an assessment with a fabricated or
+    # duplicate opportunity ID remains available for audit and bounded repair.
+    result_document["attempts"] = [{"kind": "initial", "interpretation": interpretation}]
+    if repair_interpretation is not None:
+        result_document["attempts"].append({"kind": "single_bounded_repair",
+                                            "interpretation": repair_interpretation})
+    return result_document
 
 
 def save_match_results(document, workspace):
     return write_private_json_atomic(workspace, "matches", f"snapshot-{uuid4().hex}.json", document)
+
+
+def _md_text(value):
+    """Escape untrusted source and generated text before rendering Markdown."""
+    text = html_escape(str(value).replace("\\", "\\\\"), quote=False).replace("\n", "<br>")
+    for marker in "`*_{}[]()#+-.!|":
+        text = text.replace(marker, "\\" + marker)
+    return text
+
+
+def _markdown_url(value):
+    return str(value).replace("<", "%3C").replace(">", "%3E").replace(" ", "%20")
+
+
+_OUTCOME_LABELS = {
+    "matched": "Directly supported",
+    "inferred_support": "Inferred support",
+    "not_evidenced": "Not evidenced",
+    "contradicted": "Explicitly contradicted",
+    "cannot_assess": "Cannot assess",
+}
+
+_RECOMMENDATION_LABELS = {
+    "promising_evidence": "Promising evidence for review",
+    "review_gaps_or_uncertainty": "Review gaps or uncertainty",
+    "limited_evidenced_fit": "Limited documented fit",
+    "insufficient_information": "Insufficient information",
+    "excluded_by_explicit_user_constraint": "Excluded by explicit user constraint",
+    "assessment_unavailable": "Assessment unavailable",
+}
+
+
+def render_match_results_markdown(document, opportunity_document):
+    """Render a human-readable report without turning failure into a negative match."""
+    opportunities = {item["id"]: item for item in opportunity_document.get("opportunities", [])}
+    lines = ["# Private Jobra Matching Results", "",
+             "Codex provides the semantic assessments below. Python validates references and computes explicit constraints. These results are not independent verification or hiring predictions.", ""]
+    for result in document.get("results", []):
+        opportunity = opportunities.get(result.get("opportunity_id"), {})
+        claims = opportunity.get("claims", {})
+        title = claims.get("title", {}).get("value") or "Unknown title"
+        employer = claims.get("employer", {}).get("value") or "Unknown employer"
+        status = result.get("workflow_status", "assessment_not_completed")
+        lines.extend([f"## {_md_text(employer)} — {_md_text(title)}", "",
+                      f"- Workflow status: **{_md_text(status)}**",
+                      f"- Original posting: <{_markdown_url(opportunity.get('original_url') or result.get('original_url') or '')}>",
+                      f"- Source observed: {_md_text(opportunity.get('last_observed_at') or 'Unknown')}"])
+        app = claims.get("status", {})
+        app_value = app.get("value") if app.get("origin") == "observed" else None
+        app_display = (f"{app_value} as recorded at last observation; not a current guarantee"
+                       if app_value else "Unknown; no explicit current status evidence")
+        lines.append(f"- Application status: {_md_text(app_display)}")
+        for label, field in (("Location", "location"), ("Work arrangement", "work_arrangement"),
+                             ("Seniority", "seniority")):
+            value = claims.get(field, {}).get("value")
+            lines.append(f"- {label}: {_md_text(value or 'Unknown')}")
+        recommendation = result.get("recommendation", "assessment_unavailable")
+        lines.append(f"- Recommendation: {_md_text(_RECOMMENDATION_LABELS.get(recommendation, recommendation))}")
+        if result.get("hard_filter_violations"):
+            lines.append("- Explicit user constraint: excluded by " +
+                         ", ".join(_md_text(value) for value in result["hard_filter_violations"]))
+        else:
+            lines.append("- Explicit user constraints: no exclusion matched")
+        semantic = result.get("semantic_assessment", {})
+        if status == "assessment_not_completed":
+            lines.extend(["", "No semantic assessment was completed for this opportunity. This is not a negative match."])
+        elif status == "assessment_failed_validation":
+            diagnostics = semantic.get("diagnostics", [])
+            codes = sorted({item.get("code", "validation_failed") for item in diagnostics})
+            lines.extend(["", "Assessment failed validation; no candidate-fit conclusion was produced."])
+            if codes:
+                lines.append("Validation diagnostics: " + ", ".join(_md_text(code) for code in codes))
+        elif status == "excluded_by_explicit_user_constraint":
+            lines.extend(["", "Excluded by an explicit saved user constraint. This exclusion is deterministic; it does not mean the candidate lacks the employer's qualifications."])
+            if semantic.get("status") == "invalid":
+                codes = sorted({item.get("code", "validation_failed")
+                                for item in semantic.get("diagnostics", [])})
+                lines.append("A submitted semantic assessment also failed validation: " +
+                             ", ".join(_md_text(code) for code in codes))
+        else:
+            lines.extend(["", "### Candidate fit", ""])
+            for requirement in result.get("candidate_fit", {}).get("requirements", []):
+                outcome = requirement.get("outcome", "cannot_assess")
+                label = _OUTCOME_LABELS.get(outcome, outcome)
+                lines.append(f"- **{_md_text(label)}** — {_md_text(requirement.get('statement'))}")
+                lines.append("  - Rationale: " + _md_text(requirement.get("rationale", "")))
+                refs = requirement.get("candidate_evidence_ids", [])
+                if refs:
+                    lines.append("  - Candidate evidence refs: " + ", ".join(_md_text(ref) for ref in refs))
+            experience = result.get("experience_alignment", {})
+            lines.extend(["", "### Experience and seniority", "",
+                          f"- **{_md_text(experience.get('outcome', 'unknown'))}** — {_md_text(experience.get('rationale', ''))}",
+                          "", "### Career alignment", "",
+                          f"- **{_md_text(result.get('career_alignment', {}).get('outcome', 'uncertain'))}** — {_md_text(result.get('career_alignment', {}).get('rationale', ''))}"])
+            warnings = result.get("warnings", [])
+            if warnings:
+                lines.extend(["", "### Uncertainty and freshness", "",
+                              "- " + "\n- ".join(_md_text(item) for item in warnings)])
+        lines.append("")
+    if document.get("unassigned_assessments"):
+        lines.extend(["## Unassigned assessment output", "",
+                      f"{len(document['unassigned_assessments'])} assessment item(s) did not refer to a selected opportunity. They remain in the private snapshot for debugging.", ""])
+    return "\n".join(lines)
+
+
+def save_match_report(document, opportunity_document, snapshot_path, workspace):
+    """Save the private Markdown companion to a newly persisted result snapshot."""
+    report = render_match_results_markdown(document, opportunity_document)
+    return write_private_text_atomic(workspace, "matches", snapshot_path.stem + ".md", report)
 
 
 def main():
@@ -433,20 +618,38 @@ def main():
     parser.add_argument("--repair", type=Path,
                         help="one Codex repair attempt, produced from validator diagnostics and the reference catalog")
     parser.add_argument("--workspace", type=Path, default=Path.cwd())
+    parser.add_argument("--opportunity-id", action="append", dest="opportunity_ids",
+                        help="limit results to this saved opportunity; repeat to select several")
     args = parser.parse_args()
+    result_path = None
     try:
         profile, preferences, opportunities, interpretation = [json.loads(path.read_text(encoding="utf-8")) for path in
                   (args.profile, args.preferences, args.opportunities, args.interpretation)]
         repair = json.loads(args.repair.read_text(encoding="utf-8")) if args.repair else None
         result = build_match_results_resilient(profile, preferences, opportunities,
-                                               interpretation, repair)
-        path = save_match_results(result, args.workspace)
+                                               interpretation, repair,
+                                               selected_ids=args.opportunity_ids)
+        selected_document = select_opportunity_document(opportunities, args.opportunity_ids)
+        result_path = save_match_results(result, args.workspace)
+    except MatchError as exc:
+        parser.exit(1, f"matching failed: {exc}\n")
     except (OSError, UnicodeError, ValueError, StorageError):
         parser.exit(1, "matching failed: invalid_input_or_storage\n")
+    try:
+        report_path = save_match_report(result, selected_document, result_path, args.workspace)
+    except StorageError:
+        print(json.dumps({"status": "partial", "output": str(result_path.relative_to(args.workspace)),
+                          "report_status": "private_report_write_failed"}))
+        return 1
     valid = sum(item["semantic_assessment"]["status"] == "aggregated" for item in result["results"])
-    print(json.dumps({"status": "saved", "output": str(path.relative_to(args.workspace)),
+    counts = {state: sum(item.get("workflow_status") == state for item in result["results"])
+              for state in sorted(WORKFLOW_STATES)}
+    print(json.dumps({"status": "saved", "output": str(result_path.relative_to(args.workspace)),
+                      "report": str(report_path.relative_to(args.workspace)),
                       "count": len(result["results"]), "semantic_aggregated": valid,
-                      "semantic_failed": len(result["results"]) - valid}))
+                      "semantic_failed": sum(item["semantic_assessment"]["status"] == "invalid"
+                                              for item in result["results"]),
+                      "workflow_status_counts": counts}))
     return 0
 
 
